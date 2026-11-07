@@ -115,19 +115,42 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
     },
   ];
 
-  // Subscribers rows (including TOTAL row)
+  // Subscribers rows (including TOTAL row) - 1 row per subscriber with Cash and Conversion sub-columns under Mode of Payment
   let totalSubscribed = 0;
   let totalPaid = 0;
   let totalSubShares = 0;
   const hasNonCash = data.subscribers.some(s => s.modeOfPayment !== 'Cash');
 
-  data.subscribers.forEach(s => {
-    const qty = Number(s.sharesSubscribed) || 0;
-    const pr = Number(s.subscriptionPricePerShare) || 0;
-    totalSubShares += qty;
-    totalSubscribed += qty * pr;
-    totalPaid += Number(s.amountPaid) || 0;
-  });
+  const cashSubs = data.subscribers
+    .filter(s => s.modeOfPayment === 'Cash' || s.modeOfPayment === 'Both')
+    .map(s =>
+      s.modeOfPayment === 'Both'
+        ? {
+            ...s,
+            id: `${s.id}-cash`,
+            sharesSubscribed: Number(s.cashShares) || 0,
+            amountPaid: Number(s.cashAmountPaid) || 0,
+            modeOfPayment: 'Cash' as const,
+          }
+        : s
+    );
+
+  const convSubs = data.subscribers
+    .filter(s => s.modeOfPayment === 'Conversion' || s.modeOfPayment === 'Both')
+    .map(s =>
+      s.modeOfPayment === 'Both'
+        ? {
+            ...s,
+            id: `${s.id}-conv`,
+            sharesSubscribed: Number(s.conversionShares) || 0,
+            amountPaid: Number(s.conversionAmountPaid) || 0,
+            modeOfPayment: 'Conversion' as const,
+          }
+        : s
+    );
+
+  const totalCashPaid = cashSubs.reduce((acc, s) => acc + (Number(s.amountPaid) || 0), 0);
+  const totalConvPaid = convSubs.reduce((acc, s) => acc + (Number(s.amountPaid) || 0), 0);
 
   interface SubRenderRow {
     key: string;
@@ -139,13 +162,45 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
     sharesSubscribed: number;
     amountSubscribed: number;
     amountPaid: number;
-    modeOfPayment: string;
+    cashPaid: number;
+    conversionPaid: number;
   }
 
-  const subAllRows: SubRenderRow[] = [
-    ...data.subscribers.map((s, idx) => {
+  const singleSubRows: SubRenderRow[] = data.subscribers.map((s, idx) => {
+    const pr = Number(s.subscriptionPricePerShare) || 0;
+    if (s.modeOfPayment === 'Both') {
+      const cShares = Number(s.cashShares) || 0;
+      const cPaid = Number(s.cashAmountPaid) || 0;
+      const vShares = Number(s.conversionShares) || 0;
+      const vPaid = Number(s.conversionAmountPaid) || 0;
+      const totQty = cShares + vShares;
+      const totSub = totQty * pr;
+      const totPaid = cPaid + vPaid;
+
+      totalSubShares += totQty;
+      totalSubscribed += totSub;
+      totalPaid += totPaid;
+
+      return {
+        key: s.id,
+        indexNum: idx + 1,
+        name: s.name,
+        nationality: s.nationality,
+        residentialAddress: s.residentialAddress,
+        sharesSubscribed: totQty,
+        amountSubscribed: totSub,
+        amountPaid: totPaid,
+        cashPaid: cPaid,
+        conversionPaid: vPaid,
+      };
+    } else {
       const qty = Number(s.sharesSubscribed) || 0;
-      const pr = Number(s.subscriptionPricePerShare) || 0;
+      const paid = Number(s.amountPaid) || 0;
+      const subAmt = qty * pr;
+      totalSubShares += qty;
+      totalSubscribed += subAmt;
+      totalPaid += paid;
+
       return {
         key: s.id,
         indexNum: idx + 1,
@@ -153,11 +208,16 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
         nationality: s.nationality,
         residentialAddress: s.residentialAddress,
         sharesSubscribed: qty,
-        amountSubscribed: qty * pr,
-        amountPaid: Number(s.amountPaid) || 0,
-        modeOfPayment: s.modeOfPayment === 'Cash' ? 'Cash' : 'Conversion of Liabilities',
+        amountSubscribed: subAmt,
+        amountPaid: paid,
+        cashPaid: s.modeOfPayment === 'Cash' ? paid : 0,
+        conversionPaid: s.modeOfPayment === 'Conversion' ? paid : 0,
       };
-    }),
+    }
+  });
+
+  const subAllRows: SubRenderRow[] = [
+    ...singleSubRows,
     {
       key: 'sub-total-row',
       isTotal: true,
@@ -167,7 +227,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
       sharesSubscribed: totalSubShares,
       amountSubscribed: totalSubscribed,
       amountPaid: totalPaid,
-      modeOfPayment: '',
+      cashPaid: totalCashPaid,
+      conversionPaid: totalConvPaid,
     },
   ];
 
@@ -177,12 +238,51 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
   const chairName = (data.chairName || presName).toUpperCase();
   const meetingSecName = (data.meetingSecName || secName).toUpperCase();
 
+  // Helper: When TIN is indicated (either directly or on a matching Officer/Director/Subscriber), automatically use it as Competent Evidence of Identity
+  const getCompetentEvidence = (tin?: string, evidenceId?: string, personName?: string): string => {
+    const cleanTin = (tin || '').trim();
+    if (cleanTin) {
+      return cleanTin.toUpperCase().startsWith('TIN') ? cleanTin : `TIN: ${cleanTin}`;
+    }
+    const normName = (personName || '').trim().toUpperCase();
+    if (normName) {
+      if (normName === (data.presName || '').trim().toUpperCase() && (data.presTIN || '').trim()) {
+        const t = data.presTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      if (normName === (data.treasName || '').trim().toUpperCase() && (data.treasTIN || '').trim()) {
+        const t = data.treasTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      if (normName === (data.secName || '').trim().toUpperCase() && (data.secTIN || '').trim()) {
+        const t = data.secTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      const matchedDir = data.directors.find(
+        d => (d.name || '').trim().toUpperCase() === normName && (d.tin || '').trim()
+      );
+      if (matchedDir) {
+        const t = matchedDir.tin.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      const matchedSub = data.subscribers.find(
+        s => (s.name || '').trim().toUpperCase() === normName && (s.tin || '').trim()
+      );
+      if (matchedSub && matchedSub.tin) {
+        const t = matchedSub.tin.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+    }
+    const cleanEv = (evidenceId || '').trim();
+    if (cleanEv) {
+      return /^[\d-]+$/.test(cleanEv) ? `TIN: ${cleanEv}` : cleanEv;
+    }
+    return 'Competent Evidence of Identity';
+  };
+
   // Signature table rows on Unified Certification Signature Page
   const directorPairsCount = Math.ceil(data.directors.length / 2);
   const totalSigRowsCount = directorPairsCount + 2;
-
-  const cashSubs = data.subscribers.filter(s => s.modeOfPayment === 'Cash');
-  const convSubs = data.subscribers.filter(s => s.modeOfPayment === 'Conversion');
 
   // Clean, non-overlapping table typography & cell padding
   const cellPadClass = 'px-1.5 py-1';
@@ -261,7 +361,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
         rowPrefix: string,
         rowCount: number
       ) => {
-        const headerH = getH(headerId);
+        const headerH = getH(headerId) + getH(`${headerId}-sub`);
         const rowHeights = Array.from({ length: rowCount }, (_, i) => getH(`${rowPrefix}-${i}`));
         const totalRowsH = rowHeights.reduce((a, b) => a + b, 0);
         const wholeTableH = tableMargin + headerH + totalRowsH;
@@ -335,7 +435,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
 
       // Step C: Item 4 Intro + Subscriptions Table
       const item4IntroH = getH('uc-item4-intro');
-      const subHeaderH = getH('uc-sub-header');
+      const subHeaderH = getH('uc-sub-header') + getH('uc-sub-header-sub');
       const subFirstRowH = getH('uc-sub-row-0');
       const subSecondRowH = subAllRows.length === 2 ? getH('uc-sub-row-1') : 0;
 
@@ -503,14 +603,15 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
   const renderSubColGroup = () =>
     hasNonCash ? (
       <colgroup>
-        <col style={{ width: '5%' }} />
+        <col style={{ width: '4%' }} />
+        <col style={{ width: '16%' }} />
+        <col style={{ width: '9%' }} />
         <col style={{ width: '17%' }} />
         <col style={{ width: '11%' }} />
-        <col style={{ width: '19%' }} />
-        <col style={{ width: '12%' }} />
-        <col style={{ width: '12%' }} />
-        <col style={{ width: '12%' }} />
-        <col style={{ width: '12%' }} />
+        <col style={{ width: '11%' }} />
+        <col style={{ width: '11%' }} />
+        <col style={{ width: '10.5%' }} />
+        <col style={{ width: '10.5%' }} />
       </colgroup>
     ) : (
       <colgroup>
@@ -594,39 +695,102 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
     );
   };
 
-  const renderSubHeaderRow = (measureId?: string) => (
-    <tr
-      data-measure-id={measureId}
-      className="bg-slate-100 print:bg-transparent font-bold align-middle"
-    >
-      <th className={`border border-black ${cellPadClass} text-center break-words align-middle`}>
-        #
-      </th>
-      <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
-        Name of Subscribers
-      </th>
-      <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
-        Nationality
-      </th>
-      <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
-        Residential Address
-      </th>
-      <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
-        Number of Shares Subscribed
-      </th>
-      <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
-        Amount Subscribed ({hasNonCash ? 'Php' : 'in Php'})
-      </th>
-      <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
-        Amount {hasNonCash ? 'Paid-up (Php)' : 'of Paid-up (in Php)'}
-      </th>
-      {hasNonCash && (
+  const renderSubHeaderRow = (measureId?: string) =>
+    hasNonCash ? (
+      <>
+        <tr
+          data-measure-id={measureId}
+          className="bg-slate-100 print:bg-transparent font-bold align-middle"
+        >
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-center break-words align-middle`}
+          >
+            #
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-left break-words align-middle`}
+          >
+            Name of Subscribers
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-left break-words align-middle`}
+          >
+            Nationality
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-left break-words align-middle`}
+          >
+            Residential Address
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+          >
+            Number of Shares Subscribed
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+          >
+            Amount Subscribed (Php)
+          </th>
+          <th
+            rowSpan={2}
+            className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+          >
+            Amount Paid-up (Php)
+          </th>
+          <th
+            colSpan={2}
+            className={`border border-black ${cellPadClass} text-center break-words align-middle`}
+          >
+            Mode of Payment
+          </th>
+        </tr>
+        <tr
+          data-measure-id={measureId ? `${measureId}-sub` : undefined}
+          className="bg-slate-100 print:bg-transparent font-bold align-middle"
+        >
+          <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
+            Cash (Php)
+          </th>
+          <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
+            Conversion (Php)
+          </th>
+        </tr>
+      </>
+    ) : (
+      <tr
+        data-measure-id={measureId}
+        className="bg-slate-100 print:bg-transparent font-bold align-middle"
+      >
         <th className={`border border-black ${cellPadClass} text-center break-words align-middle`}>
-          Mode of Payment
+          #
         </th>
-      )}
-    </tr>
-  );
+        <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
+          Name of Subscribers
+        </th>
+        <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
+          Nationality
+        </th>
+        <th className={`border border-black ${cellPadClass} text-left break-words align-middle`}>
+          Residential Address
+        </th>
+        <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
+          Number of Shares Subscribed
+        </th>
+        <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
+          Amount Subscribed (in Php)
+        </th>
+        <th className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
+          Amount of Paid-up (in Php)
+        </th>
+      </tr>
+    );
 
   const renderSubDataRow = (row: SubRenderRow, measureId?: string) => {
     if (row.isTotal) {
@@ -651,7 +815,20 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
           <td className={`border border-black ${cellPadClass} text-right break-words align-middle`}>
             {fmtNum(row.amountPaid)}
           </td>
-          {hasNonCash && <td className={`border border-black ${cellPadClass} align-middle`}></td>}
+          {hasNonCash && (
+            <>
+              <td
+                className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+              >
+                {fmtNum(row.cashPaid)}
+              </td>
+              <td
+                className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+              >
+                {fmtNum(row.conversionPaid)}
+              </td>
+            </>
+          )}
         </tr>
       );
     }
@@ -679,11 +856,18 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
           {fmtNum(row.amountPaid)}
         </td>
         {hasNonCash && (
-          <td
-            className={`border border-black ${cellPadClass} text-center break-words align-middle`}
-          >
-            {row.modeOfPayment}
-          </td>
+          <>
+            <td
+              className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+            >
+              {row.cashPaid > 0 ? fmtNum(row.cashPaid) : '-'}
+            </td>
+            <td
+              className={`border border-black ${cellPadClass} text-right break-words align-middle`}
+            >
+              {row.conversionPaid > 0 ? fmtNum(row.conversionPaid) : '-'}
+            </td>
+          </>
         )}
       </tr>
     );
@@ -1014,7 +1198,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                   {d.name.toUpperCase()}
                 </td>
                 <td className="border border-black px-1.5 py-1 break-words">
-                  {d.evidenceId || 'Competent Evidence of Identity'}
+                  {getCompetentEvidence(d.tin, d.evidenceId, d.name)}
                 </td>
               </tr>
             ))}
@@ -1173,7 +1357,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                               {d.name.toUpperCase()}
                             </td>
                             <td className="border border-black px-1.5 py-1 break-words align-middle">
-                              {d.evidenceId || 'Competent Evidence of Identity'}
+                              {getCompetentEvidence(d.tin, d.evidenceId, d.name)}
                             </td>
                           </tr>
                         );
@@ -1235,12 +1419,28 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
         <p className="indent-10 text-justify mb-3">
           That out of <b>{formatPesos(increase)}</b> representing the increase in the authorized
           capital stock, <b>{formatPesos(totalSubscribed)}</b> has been actually subscribed and that
-          of said subscription <b>{formatPesos(totalPaid)}</b> has been actually paid to for the
-          benefit and to the credit of the corporation and that at least twenty-five per centum
-          (25%) of the increase in authorized capital has been subscribed and that at least
-          twenty-five per cent (25%) of such subscription has been actually paid to me for the
-          benefit and to the credit of the corporation and that said payment represents fresh and
-          additional paid-in capital of the corporation.
+          of said subscription{' '}
+          {cashSubs.length > 0 && convSubs.length > 0 ? (
+            <>
+              <b>{formatPesos(totalCashPaid)}</b> in <b>CASH</b> and{' '}
+              <b>{formatPesos(totalConvPaid)}</b> via{' '}
+              <b>CONVERSION OF LIABILITIES INTO EQUITY</b>
+            </>
+          ) : convSubs.length > 0 ? (
+            <>
+              <b>{formatPesos(totalConvPaid)}</b> via{' '}
+              <b>CONVERSION OF LIABILITIES INTO EQUITY</b>
+            </>
+          ) : (
+            <>
+              <b>{formatPesos(totalCashPaid)}</b> in <b>CASH</b>
+            </>
+          )}{' '}
+          has been actually paid to for the benefit and to the credit of the corporation and that at
+          least twenty-five per centum (25%) of the increase in authorized capital has been
+          subscribed and that at least twenty-five per cent (25%) of such subscription has been
+          actually paid to me for the benefit and to the credit of the corporation and that said
+          payment represents fresh and additional paid-in capital of the corporation.
         </p>
 
         <div className="mt-12 text-center w-64 ml-auto">
@@ -1410,14 +1610,66 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                   Republic of the Philippines )<br />
                   City of {data.execCity} ) S.S.
                 </div>
-                <p className="indent-10 text-justify mb-4">
+                <p className="indent-10 text-justify mb-3">
                   BEFORE ME, a Notary Public in and for {data.execCity}, Philippines, this _____ day
-                  of _______________ {execYear}, personally appeared <b>{sub.name.toUpperCase()}</b>{' '}
-                  (with Evidence of Identity: {sub.evidenceId || 'Competent Evidence of Identity'})
-                  and the authorized officers of <b>{data.corpName.toUpperCase()}</b>, known to me
-                  to be the same persons who executed the foregoing Subscription Contract and
-                  acknowledged to me that the same is their free and voluntary act and deed and that
-                  of the Corporation represented.
+                  of _______________ {execYear}, personally appeared the following persons with their
+                  respective Competent Evidence of Identity:
+                </p>
+                {(() => {
+                  const rawAffiants = [
+                    {
+                      name: sub.name.toUpperCase(),
+                      evidence: getCompetentEvidence(sub.tin, sub.evidenceId, sub.name),
+                    },
+                    {
+                      name: presName,
+                      evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                    },
+                    {
+                      name: treasName,
+                      evidence: getCompetentEvidence(data.treasTIN, undefined, data.treasName),
+                    },
+                  ];
+                  const seen = new Set<string>();
+                  const uniqueAffiants = rawAffiants.filter(a => {
+                    const key = a.name.trim();
+                    if (!key || seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                  });
+                  return (
+                    <table className="w-[85%] border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
+                      <colgroup>
+                        <col style={{ width: '45%' }} />
+                        <col style={{ width: '55%' }} />
+                      </colgroup>
+                      <tbody>
+                        <tr className="bg-slate-100 print:bg-transparent font-bold align-middle">
+                          <th className="border border-black px-1.5 py-1 text-left break-words align-middle">
+                            Name
+                          </th>
+                          <th className="border border-black px-1.5 py-1 text-left break-words align-middle">
+                            Competent Evidence of Identity
+                          </th>
+                        </tr>
+                        {uniqueAffiants.map((aff, aIdx) => (
+                          <tr key={aIdx} className="align-middle">
+                            <td className="border border-black px-1.5 py-1 font-semibold break-words align-middle">
+                              {aff.name}
+                            </td>
+                            <td className="border border-black px-1.5 py-1 break-words align-middle">
+                              {aff.evidence}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  );
+                })()}
+                <p className="indent-10 text-justify mb-4">
+                  known to me to be the same persons who executed the foregoing Subscription Contract
+                  and acknowledged to me that the same is their free and voluntary act and deed and
+                  that of the Corporation represented.
                 </p>
                 <div className="w-56 ml-auto text-left mt-4">NOTARY PUBLIC</div>
                 <div className="text-left mt-2">
@@ -1441,7 +1693,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
       {convSubs.map(sub => {
         const sSub =
           (Number(sub.sharesSubscribed) || 0) * (Number(sub.subscriptionPricePerShare) || 0);
-        const liabDesc = sub.liabilityDescription || 'Deposits for Future Stock Subscriptions';
+        const liabDesc = sub.liabilityDescription?.trim() || '_________________________';
 
         return (
           <React.Fragment key={sub.id}>
@@ -1570,14 +1822,62 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
                   S.S.
                 </div>
-                <p className="indent-10 text-justify mb-4">
+                <p className="indent-10 text-justify mb-3">
                   BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____
-                  day of _______________ {execYear}, personally appeared the Assignor{' '}
-                  <b>{sub.name.toUpperCase()}</b> (with Competent Evidence of Identity:{' '}
-                  {sub.evidenceId || 'Competent Evidence of Identity'}) and the representative of
-                  the Assignee <b>{presName}</b>, known to me to be the same persons who executed
-                  the foregoing Deed of Assignment, and acknowledged to me that the same is their
-                  free and voluntary act and deed and that of the entity they represent.
+                  day of _______________ {execYear}, personally appeared the following persons with
+                  their respective Competent Evidence of Identity:
+                </p>
+                {(() => {
+                  const rawAffiants = [
+                    {
+                      name: sub.name.toUpperCase(),
+                      evidence: getCompetentEvidence(sub.tin, sub.evidenceId, sub.name),
+                    },
+                    {
+                      name: presName,
+                      evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                    },
+                  ];
+                  const seen = new Set<string>();
+                  const uniqueAffiants = rawAffiants.filter(a => {
+                    const key = a.name.trim();
+                    if (!key || seen.has(key)) return false;
+                    seen.add(key);
+                    return true;
+                  });
+                  return (
+                    <table className="w-[85%] border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
+                      <colgroup>
+                        <col style={{ width: '45%' }} />
+                        <col style={{ width: '55%' }} />
+                      </colgroup>
+                      <tbody>
+                        <tr className="bg-slate-100 print:bg-transparent font-bold align-middle">
+                          <th className="border border-black px-1.5 py-1 text-left break-words align-middle">
+                            Name
+                          </th>
+                          <th className="border border-black px-1.5 py-1 text-left break-words align-middle">
+                            Competent Evidence of Identity
+                          </th>
+                        </tr>
+                        {uniqueAffiants.map((aff, aIdx) => (
+                          <tr key={aIdx} className="align-middle">
+                            <td className="border border-black px-1.5 py-1 font-semibold break-words align-middle">
+                              {aff.name}
+                            </td>
+                            <td className="border border-black px-1.5 py-1 break-words align-middle">
+                              {aff.evidence}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  );
+                })()}
+                <p className="indent-10 text-justify mb-4">
+                  known to me to be the same persons who executed the foregoing Deed of Assignment,
+                  and acknowledged to me that the same is their free and voluntary act and deed and
+                  that of the entity they represent.
                 </p>
                 <div className="w-56 ml-auto text-left mt-4">NOTARY PUBLIC</div>
                 <div className="text-left mt-2">

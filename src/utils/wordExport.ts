@@ -77,12 +77,136 @@ export function exportToWordA4(data: SecFormData): void {
   let totalPaid = 0;
   const hasNonCash = data.subscribers.some(s => s.modeOfPayment !== 'Cash');
 
-  data.subscribers.forEach(s => {
-    const sSub =
-      (Number(s.sharesSubscribed) || 0) * (Number(s.subscriptionPricePerShare) || 0);
-    totalSubscribed += sSub;
-    totalPaid += Number(s.amountPaid) || 0;
+  const cashSubs = data.subscribers
+    .filter(s => s.modeOfPayment === 'Cash' || s.modeOfPayment === 'Both')
+    .map(s =>
+      s.modeOfPayment === 'Both'
+        ? {
+            ...s,
+            id: `${s.id}-cash`,
+            sharesSubscribed: Number(s.cashShares) || 0,
+            amountPaid: Number(s.cashAmountPaid) || 0,
+            modeOfPayment: 'Cash' as const,
+          }
+        : s
+    );
+
+  const convSubs = data.subscribers
+    .filter(s => s.modeOfPayment === 'Conversion' || s.modeOfPayment === 'Both')
+    .map(s =>
+      s.modeOfPayment === 'Both'
+        ? {
+            ...s,
+            id: `${s.id}-conv`,
+            sharesSubscribed: Number(s.conversionShares) || 0,
+            amountPaid: Number(s.conversionAmountPaid) || 0,
+            modeOfPayment: 'Conversion' as const,
+          }
+        : s
+    );
+
+  const totalCashPaid = cashSubs.reduce((acc, s) => acc + (Number(s.amountPaid) || 0), 0);
+  const totalConvPaid = convSubs.reduce((acc, s) => acc + (Number(s.amountPaid) || 0), 0);
+
+  interface WordSubRow {
+    name: string;
+    nationality: string;
+    residentialAddress: string;
+    sharesSubscribed: number;
+    amountSubscribed: number;
+    amountPaid: number;
+    cashPaid: number;
+    conversionPaid: number;
+  }
+
+  let totalSubShares = 0;
+  const singleWordSubs: WordSubRow[] = data.subscribers.map(s => {
+    const pr = Number(s.subscriptionPricePerShare) || 0;
+    if (s.modeOfPayment === 'Both') {
+      const cShares = Number(s.cashShares) || 0;
+      const cPaid = Number(s.cashAmountPaid) || 0;
+      const vShares = Number(s.conversionShares) || 0;
+      const vPaid = Number(s.conversionAmountPaid) || 0;
+      const totQty = cShares + vShares;
+      const totSub = totQty * pr;
+      const totPaid = cPaid + vPaid;
+
+      totalSubShares += totQty;
+      totalSubscribed += totSub;
+      totalPaid += totPaid;
+
+      return {
+        name: s.name,
+        nationality: s.nationality,
+        residentialAddress: s.residentialAddress,
+        sharesSubscribed: totQty,
+        amountSubscribed: totSub,
+        amountPaid: totPaid,
+        cashPaid: cPaid,
+        conversionPaid: vPaid,
+      };
+    } else {
+      const qty = Number(s.sharesSubscribed) || 0;
+      const paid = Number(s.amountPaid) || 0;
+      const subAmt = qty * pr;
+      totalSubShares += qty;
+      totalSubscribed += subAmt;
+      totalPaid += paid;
+
+      return {
+        name: s.name,
+        nationality: s.nationality,
+        residentialAddress: s.residentialAddress,
+        sharesSubscribed: qty,
+        amountSubscribed: subAmt,
+        amountPaid: paid,
+        cashPaid: s.modeOfPayment === 'Cash' ? paid : 0,
+        conversionPaid: s.modeOfPayment === 'Conversion' ? paid : 0,
+      };
+    }
   });
+
+  // Helper: When TIN is indicated (either directly or on a matching Officer/Director/Subscriber), automatically use it as Competent Evidence of Identity
+  const getCompetentEvidence = (tin?: string, evidenceId?: string, personName?: string): string => {
+    const cleanTin = (tin || '').trim();
+    if (cleanTin) {
+      return cleanTin.toUpperCase().startsWith('TIN') ? cleanTin : `TIN: ${cleanTin}`;
+    }
+    const normName = (personName || '').trim().toUpperCase();
+    if (normName) {
+      if (normName === (data.presName || '').trim().toUpperCase() && (data.presTIN || '').trim()) {
+        const t = data.presTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      if (normName === (data.treasName || '').trim().toUpperCase() && (data.treasTIN || '').trim()) {
+        const t = data.treasTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      if (normName === (data.secName || '').trim().toUpperCase() && (data.secTIN || '').trim()) {
+        const t = data.secTIN.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      const matchedDir = data.directors.find(
+        d => (d.name || '').trim().toUpperCase() === normName && (d.tin || '').trim()
+      );
+      if (matchedDir) {
+        const t = matchedDir.tin.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+      const matchedSub = data.subscribers.find(
+        s => (s.name || '').trim().toUpperCase() === normName && (s.tin || '').trim()
+      );
+      if (matchedSub && matchedSub.tin) {
+        const t = matchedSub.tin.trim();
+        return t.toUpperCase().startsWith('TIN') ? t : `TIN: ${t}`;
+      }
+    }
+    const cleanEv = (evidenceId || '').trim();
+    if (cleanEv) {
+      return /^[\d-]+$/.test(cleanEv) ? `TIN: ${cleanEv}` : cleanEv;
+    }
+    return 'Competent Evidence of Identity';
+  };
 
   // Checkbox helpers for Item 6
   const boxHtml = (checked: boolean) =>
@@ -95,20 +219,22 @@ export function exportToWordA4(data: SecFormData): void {
   if (hasNonCash) {
     subTableHeaderRow = `
       <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
-        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center; width: 4%;">#</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; width: 19%;">Name of Subscribers</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; width: 10%;">Nationality</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; width: 21%;">Residential Address</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 12%;">Number of Shares Subscribed</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 11%;">Amount Subscribed (Php)</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 11%;">Amount Paid-up (Php)</td>
-        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center; width: 12%;">Mode of Payment</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; text-align: center; width: 4%;">#</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; width: 16%;">Name of Subscribers</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; width: 9%;">Nationality</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; width: 17%;">Residential Address</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 11%;">Number of Shares Subscribed</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 11%;">Amount Subscribed (Php)</td>
+        <td rowspan="2" style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 11%;">Amount Paid-up (Php)</td>
+        <td colspan="2" style="border: 1pt solid black; padding: 3pt 5pt; text-align: center; width: 21%;">Mode of Payment</td>
+      </tr>
+      <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
+        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 10.5%;">Cash (Php)</td>
+        <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 10.5%;">Conversion (Php)</td>
       </tr>
     `;
-    subTableRows = data.subscribers
+    subTableRows = singleWordSubs
       .map((s, idx) => {
-        const sSub =
-          (Number(s.sharesSubscribed) || 0) * (Number(s.subscriptionPricePerShare) || 0);
         return `
         <tr style="page-break-inside: avoid;">
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center;">${idx + 1}</td>
@@ -116,9 +242,10 @@ export function exportToWordA4(data: SecFormData): void {
           <td style="border: 1pt solid black; padding: 3pt 5pt;">${s.nationality}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt;">${s.residentialAddress}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtShares(s.sharesSubscribed)} Common</td>
-          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(sSub)}</td>
+          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(s.amountSubscribed)}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(s.amountPaid)}</td>
-          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center;">${s.modeOfPayment === 'Cash' ? 'Cash' : 'Conversion of Liabilities'}</td>
+          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${s.cashPaid > 0 ? fmtNum(s.cashPaid) : '-'}</td>
+          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${s.conversionPaid > 0 ? fmtNum(s.conversionPaid) : '-'}</td>
         </tr>
       `;
       })
@@ -135,10 +262,8 @@ export function exportToWordA4(data: SecFormData): void {
         <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right; width: 12%;">Amount of Paid-up (in Php)</td>
       </tr>
     `;
-    subTableRows = data.subscribers
+    subTableRows = singleWordSubs
       .map((s, idx) => {
-        const sSub =
-          (Number(s.sharesSubscribed) || 0) * (Number(s.subscriptionPricePerShare) || 0);
         return `
         <tr style="page-break-inside: avoid;">
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center;">${idx + 1}</td>
@@ -146,7 +271,7 @@ export function exportToWordA4(data: SecFormData): void {
           <td style="border: 1pt solid black; padding: 3pt 5pt;">${s.nationality}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt;">${s.residentialAddress}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtShares(s.sharesSubscribed)} Common</td>
-          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(sSub)}</td>
+          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(s.amountSubscribed)}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(s.amountPaid)}</td>
         </tr>
       `;
@@ -185,8 +310,8 @@ export function exportToWordA4(data: SecFormData): void {
     .map(
       d => `
     <tr style="page-break-inside: avoid;">
-      <td style="border: 1pt solid black; padding: 3pt 5pt;">${d.name.toUpperCase()}</td>
-      <td style="border: 1pt solid black; padding: 3pt 5pt;">${d.evidenceId || 'Competent Evidence of Identity'}</td>
+      <td style="border: 1pt solid black; padding: 3pt 5pt; font-weight: bold;">${d.name.toUpperCase()}</td>
+      <td style="border: 1pt solid black; padding: 3pt 5pt;">${getCompetentEvidence(d.tin, d.evidenceId, d.name)}</td>
     </tr>
   `
     )
@@ -258,10 +383,15 @@ export function exportToWordA4(data: SecFormData): void {
         ${subTableRows}
         <tr style="font-weight: bold; background-color: #fafafa; page-break-inside: avoid;">
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: center;" colspan="4">TOTAL</td>
-          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtShares(data.subscribers.reduce((a, b) => a + (Number(b.sharesSubscribed) || 0), 0))}</td>
+          <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtShares(totalSubShares)}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(totalSubscribed)}</td>
           <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(totalPaid)}</td>
-          ${hasNonCash ? '<td style="border: 1pt solid black;"></td>' : ''}
+          ${
+            hasNonCash
+              ? `<td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(totalCashPaid)}</td>
+                 <td style="border: 1pt solid black; padding: 3pt 5pt; text-align: right;">${fmtNum(totalConvPaid)}</td>`
+              : ''
+          }
         </tr>
       </tbody>
     </table>
@@ -389,7 +519,13 @@ export function exportToWordA4(data: SecFormData): void {
       That I was elected Treasurer by the stockholders of <b>${data.corpName.toUpperCase()}</b>, to act as such until my successor has been duly elected and qualified in accordance with the By-Laws of the corporation, and that as such Treasurer, I have been authorized to receive for the corporation all subscriptions paid in by the subscribers for capital stock;
     </p>
     <p style="text-indent: 36pt; text-align: justify;">
-      That out of <b>${formatPesos(increase)}</b> representing the increase in the authorized capital stock, <b>${formatPesos(totalSubscribed)}</b> has been actually subscribed and that of said subscription <b>${formatPesos(totalPaid)}</b> has been actually paid to for the benefit and to the credit of the corporation and that at least twenty-five per centum (25%) of the increase in authorized capital has been subscribed and that at least twenty-five per cent (25%) of such subscription has been actually paid to me for the benefit and to the credit of the corporation and that said payment represents fresh and additional paid-in capital of the corporation.
+      That out of <b>${formatPesos(increase)}</b> representing the increase in the authorized capital stock, <b>${formatPesos(totalSubscribed)}</b> has been actually subscribed and that of said subscription ${
+        cashSubs.length > 0 && convSubs.length > 0
+          ? `<b>${formatPesos(totalCashPaid)}</b> in <b>CASH</b> and <b>${formatPesos(totalConvPaid)}</b> via <b>CONVERSION OF LIABILITIES INTO EQUITY</b>`
+          : convSubs.length > 0
+            ? `<b>${formatPesos(totalConvPaid)}</b> via <b>CONVERSION OF LIABILITIES INTO EQUITY</b>`
+            : `<b>${formatPesos(totalCashPaid)}</b> in <b>CASH</b>`
+      } has been actually paid to for the benefit and to the credit of the corporation and that at least twenty-five per centum (25%) of the increase in authorized capital has been subscribed and that at least twenty-five per cent (25%) of such subscription has been actually paid to me for the benefit and to the credit of the corporation and that said payment represents fresh and additional paid-in capital of the corporation.
     </p>
 
     <br /><br /><br />
@@ -421,7 +557,6 @@ export function exportToWordA4(data: SecFormData): void {
   `;
 
   // === DOCUMENT 3: SUBSCRIPTION CONTRACTS (FOR CASH SUBSCRIBERS) ===
-  const cashSubs = data.subscribers.filter(s => s.modeOfPayment === 'Cash');
   const cashContractsHtml = cashSubs.map(sub => {
     const sSub =
       (Number(sub.sharesSubscribed) || 0) * (Number(sub.subscriptionPricePerShare) || 0);
@@ -511,7 +646,50 @@ export function exportToWordA4(data: SecFormData): void {
           City of ${data.execCity} ) S.S.
         </div>
         <p style="text-indent: 36pt; text-align: justify;">
-          BEFORE ME, a Notary Public in and for ${data.execCity}, Philippines, this _____ day of _______________ ${execYear}, personally appeared <b>${sub.name.toUpperCase()}</b> (with Competent Evidence of Identity: ${sub.evidenceId || 'Competent Evidence of Identity'}) and the authorized officers of <b>${data.corpName.toUpperCase()}</b>, known to me to be the same persons who executed the foregoing Subscription Contract and acknowledged to me that the same is their free and voluntary act and deed as well as that of the Corporation represented.
+          BEFORE ME, a Notary Public in and for ${data.execCity}, Philippines, this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
+        </p>
+        <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
+          <tbody>
+            <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
+              <td style="border: 1pt solid black; padding: 3pt 5pt; width: 45%;">Name</td>
+              <td style="border: 1pt solid black; padding: 3pt 5pt; width: 55%;">Competent Evidence of Identity</td>
+            </tr>
+            ${(() => {
+              const rawAffiants = [
+                {
+                  name: sub.name.toUpperCase(),
+                  evidence: getCompetentEvidence(sub.tin, sub.evidenceId, sub.name),
+                },
+                {
+                  name: presName,
+                  evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                },
+                {
+                  name: treasName,
+                  evidence: getCompetentEvidence(data.treasTIN, undefined, data.treasName),
+                },
+              ];
+              const seen = new Set<string>();
+              return rawAffiants
+                .filter(a => {
+                  const k = a.name.trim();
+                  if (!k || seen.has(k)) return false;
+                  seen.add(k);
+                  return true;
+                })
+                .map(
+                  a => `
+                <tr style="page-break-inside: avoid;">
+                  <td style="border: 1pt solid black; padding: 3pt 5pt; font-weight: bold;">${a.name}</td>
+                  <td style="border: 1pt solid black; padding: 3pt 5pt;">${a.evidence}</td>
+                </tr>`
+                )
+                .join('');
+            })()}
+          </tbody>
+        </table>
+        <p style="text-indent: 36pt; text-align: justify;">
+          known to me to be the same persons who executed the foregoing Subscription Contract and acknowledged to me that the same is their free and voluntary act and deed as well as that of the Corporation represented.
         </p>
         <br />
         <div style="text-align: right; margin-right: 40pt;">
@@ -530,11 +708,10 @@ export function exportToWordA4(data: SecFormData): void {
   });
 
   // === DOCUMENT 4: DEEDS OF ASSIGNMENT (CONVERSION SUBSCRIBERS) ===
-  const convSubs = data.subscribers.filter(s => s.modeOfPayment === 'Conversion');
   const convDeedsHtml = convSubs.map(sub => {
     const sSub =
       (Number(sub.sharesSubscribed) || 0) * (Number(sub.subscriptionPricePerShare) || 0);
-    const liabDesc = sub.liabilityDescription || 'Deposits for Future Stock Subscriptions';
+    const liabDesc = sub.liabilityDescription?.trim() || '_________________________';
 
     const bodyPart = `
       <h2>DEED OF ASSIGNMENT</h2>
@@ -606,7 +783,46 @@ export function exportToWordA4(data: SecFormData): void {
           ${data.execCity.toUpperCase()} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;] S.S.
         </div>
         <p style="text-indent: 36pt; text-align: justify;">
-          BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____ day of _______________ ${execYear}, personally appeared the Assignor <b>${sub.name.toUpperCase()}</b> (with Competent Evidence of Identity: ${sub.evidenceId || 'Competent Evidence of Identity'}) and the representative of the Assignee <b>${presName}</b>, known to me to be the same persons who executed the foregoing Deed of Assignment, and acknowledged to me that the same is their free and voluntary act and deed and that of the entity they represent.
+          BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
+        </p>
+        <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
+          <tbody>
+            <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
+              <td style="border: 1pt solid black; padding: 3pt 5pt; width: 45%;">Name</td>
+              <td style="border: 1pt solid black; padding: 3pt 5pt; width: 55%;">Competent Evidence of Identity</td>
+            </tr>
+            ${(() => {
+              const rawAffiants = [
+                {
+                  name: sub.name.toUpperCase(),
+                  evidence: getCompetentEvidence(sub.tin, sub.evidenceId, sub.name),
+                },
+                {
+                  name: presName,
+                  evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                },
+              ];
+              const seen = new Set<string>();
+              return rawAffiants
+                .filter(a => {
+                  const k = a.name.trim();
+                  if (!k || seen.has(k)) return false;
+                  seen.add(k);
+                  return true;
+                })
+                .map(
+                  a => `
+                <tr style="page-break-inside: avoid;">
+                  <td style="border: 1pt solid black; padding: 3pt 5pt; font-weight: bold;">${a.name}</td>
+                  <td style="border: 1pt solid black; padding: 3pt 5pt;">${a.evidence}</td>
+                </tr>`
+                )
+                .join('');
+            })()}
+          </tbody>
+        </table>
+        <p style="text-indent: 36pt; text-align: justify;">
+          known to me to be the same persons who executed the foregoing Deed of Assignment, and acknowledged to me that the same is their free and voluntary act and deed and that of the entity they represent.
         </p>
         <br />
         <div style="text-align: right; margin-right: 40pt;">

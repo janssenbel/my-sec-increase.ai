@@ -41,11 +41,21 @@ export default function App() {
   let convSubCount = 0;
 
   formData.subscribers.forEach(s => {
-    const sSub = (Number(s.sharesSubscribed) || 0) * (Number(s.subscriptionPricePerShare) || 0);
-    totalSubscribed += sSub;
-    totalPaid += Number(s.amountPaid) || 0;
-    if (s.modeOfPayment === 'Cash') cashSubCount++;
-    else convSubCount++;
+    if (s.modeOfPayment === 'Both') {
+      const cShares = Number(s.cashShares) || 0;
+      const vShares = Number(s.conversionShares) || 0;
+      const pr = Number(s.subscriptionPricePerShare) || 0;
+      totalSubscribed += (cShares + vShares) * pr;
+      totalPaid += (Number(s.cashAmountPaid) || 0) + (Number(s.conversionAmountPaid) || 0);
+      cashSubCount++;
+      convSubCount++;
+    } else {
+      const sSub = (Number(s.sharesSubscribed) || 0) * (Number(s.subscriptionPricePerShare) || 0);
+      totalSubscribed += sSub;
+      totalPaid += Number(s.amountPaid) || 0;
+      if (s.modeOfPayment === 'Cash') cashSubCount++;
+      else convSubCount++;
+    }
   });
 
   const reqSubscribed25 = increase * 0.25;
@@ -118,7 +128,17 @@ export default function App() {
   const updateDirector = (id: string, updates: Partial<Director>) => {
     setFormData(prev => ({
       ...prev,
-      directors: prev.directors.map(d => (d.id === id ? { ...d, ...updates } : d)),
+      directors: prev.directors.map(d => {
+        if (d.id !== id) return d;
+        const merged = { ...d, ...updates };
+        if ('tin' in updates) {
+          const tinVal = (updates.tin || '').trim();
+          if (tinVal) {
+            merged.evidenceId = tinVal.toUpperCase().startsWith('TIN') ? tinVal : `TIN: ${tinVal}`;
+          }
+        }
+        return merged;
+      }),
     }));
   };
 
@@ -140,8 +160,9 @@ export default function App() {
       subscriptionPricePerShare: par,
       amountPaid: 1000 * par,
       modeOfPayment: 'Cash',
+      tin: '',
       evidenceId: '',
-      liabilityDescription: 'Deposits for Future Stock Subscriptions',
+      liabilityDescription: '',
     };
     setFormData(prev => ({
       ...prev,
@@ -155,9 +176,48 @@ export default function App() {
       subscribers: prev.subscribers.map(s => {
         if (s.id !== id) return s;
         const merged = { ...s, ...updates };
-        if ('sharesSubscribed' in updates || 'subscriptionPricePerShare' in updates) {
+        const pr = Number(merged.subscriptionPricePerShare) || 0;
+
+        if ('tin' in updates) {
+          const tinVal = (updates.tin || '').trim();
+          if (tinVal) {
+            merged.evidenceId = tinVal.toUpperCase().startsWith('TIN') ? tinVal : `TIN: ${tinVal}`;
+          }
+        }
+
+        if (updates.modeOfPayment === 'Both' && s.modeOfPayment !== 'Both') {
+          const totalQty = Number(s.sharesSubscribed) || 0;
+          const cShares =
+            s.cashShares !== undefined ? Number(s.cashShares) : Math.floor(totalQty / 2);
+          const vShares =
+            s.conversionShares !== undefined ? Number(s.conversionShares) : totalQty - cShares;
+          merged.cashShares = cShares;
+          merged.cashAmountPaid = cShares * pr;
+          merged.conversionShares = vShares;
+          merged.conversionAmountPaid = vShares * pr;
+          merged.sharesSubscribed = cShares + vShares;
+          merged.amountPaid = merged.cashAmountPaid + merged.conversionAmountPaid;
+          return merged;
+        }
+
+        if (merged.modeOfPayment === 'Both') {
+          const cShares = Number(merged.cashShares) || 0;
+          const vShares = Number(merged.conversionShares) || 0;
+          let cPaid = Number(merged.cashAmountPaid) || 0;
+          let vPaid = Number(merged.conversionAmountPaid) || 0;
+
+          if ('cashShares' in updates || 'subscriptionPricePerShare' in updates) {
+            cPaid = cShares * pr;
+            merged.cashAmountPaid = cPaid;
+          }
+          if ('conversionShares' in updates || 'subscriptionPricePerShare' in updates) {
+            vPaid = vShares * pr;
+            merged.conversionAmountPaid = vPaid;
+          }
+          merged.sharesSubscribed = cShares + vShares;
+          merged.amountPaid = cPaid + vPaid;
+        } else if ('sharesSubscribed' in updates || 'subscriptionPricePerShare' in updates) {
           const qty = Number(merged.sharesSubscribed) || 0;
-          const pr = Number(merged.subscriptionPricePerShare) || 0;
           merged.amountPaid = qty * pr;
         }
         return merged;
@@ -948,17 +1008,17 @@ export default function App() {
                       <th className="p-2.5 w-24">Nationality</th>
                       <th className="p-2.5">Residential Address</th>
                       <th className="p-2.5 w-28 text-right">Shares Subscribed</th>
-                      <th className="p-2.5 w-28 text-right">Price / Share</th>
+                      <th className="p-2.5 w-24 text-right">Price / Share</th>
                       <th className="p-2.5 w-28 text-right">Amount Paid</th>
-                      <th className="p-2.5 w-36 text-center">Payment Mode</th>
-                      <th className="p-2.5">Evidence of ID</th>
+                      <th className="p-2.5 w-72 text-center">Payment Mode &amp; Details</th>
+                      <th className="p-2.5 w-48">TIN / Competent Evidence of ID</th>
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200">
                     {formData.subscribers.map(s => (
                       <tr key={s.id} className="hover:bg-slate-50">
-                        <td className="p-2">
+                        <td className="p-2 align-top">
                           <input
                             type="text"
                             value={s.name}
@@ -967,7 +1027,7 @@ export default function App() {
                             className="w-full px-2 py-1 border border-slate-300 rounded text-xs font-medium"
                           />
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 align-top">
                           <input
                             type="text"
                             value={s.nationality}
@@ -975,7 +1035,7 @@ export default function App() {
                             className="w-full px-2 py-1 border border-slate-300 rounded text-xs"
                           />
                         </td>
-                        <td className="p-2">
+                        <td className="p-2 align-top">
                           <input
                             type="text"
                             value={s.residentialAddress}
@@ -986,19 +1046,27 @@ export default function App() {
                             className="w-full px-2 py-1 border border-slate-300 rounded text-xs"
                           />
                         </td>
-                        <td className="p-2 text-right">
+                        <td className="p-2 text-right align-top">
                           <input
                             type="number"
                             value={s.sharesSubscribed}
+                            readOnly={s.modeOfPayment === 'Both'}
                             onChange={e =>
                               updateSubscriber(s.id, {
                                 sharesSubscribed: parseFloat(e.target.value) || 0,
                               })
                             }
-                            className="w-full text-right px-2 py-1 border border-slate-300 rounded text-xs"
+                            className={`w-full text-right px-2 py-1 border border-slate-300 rounded text-xs ${
+                              s.modeOfPayment === 'Both' ? 'bg-slate-100 text-slate-600 font-semibold' : ''
+                            }`}
                           />
+                          {s.modeOfPayment === 'Both' && (
+                            <span className="block text-[10px] text-slate-400 mt-0.5">
+                              Auto-summed
+                            </span>
+                          )}
                         </td>
-                        <td className="p-2 text-right">
+                        <td className="p-2 text-right align-top">
                           <input
                             type="number"
                             step="0.01"
@@ -1011,47 +1079,192 @@ export default function App() {
                             className="w-full text-right px-2 py-1 border border-slate-300 rounded text-xs"
                           />
                         </td>
-                        <td className="p-2 text-right">
+                        <td className="p-2 text-right align-top">
                           <input
                             type="number"
                             step="0.01"
                             value={s.amountPaid}
+                            readOnly={s.modeOfPayment === 'Both'}
                             onChange={e =>
                               updateSubscriber(s.id, {
                                 amountPaid: parseFloat(e.target.value) || 0,
                               })
                             }
-                            className="w-full text-right px-2 py-1 border border-slate-300 rounded text-xs font-semibold"
+                            className={`w-full text-right px-2 py-1 border border-slate-300 rounded text-xs font-semibold ${
+                              s.modeOfPayment === 'Both' ? 'bg-slate-100 text-slate-700' : ''
+                            }`}
                           />
+                          {s.modeOfPayment === 'Both' && (
+                            <span className="block text-[10px] text-slate-400 mt-0.5">
+                              Auto-summed
+                            </span>
+                          )}
                         </td>
-                        <td className="p-2 text-center">
+                        <td className="p-2 text-center align-top">
                           <select
                             value={s.modeOfPayment}
                             onChange={e =>
                               updateSubscriber(s.id, {
-                                modeOfPayment: e.target.value as 'Cash' | 'Conversion',
+                                modeOfPayment: e.target.value as 'Cash' | 'Conversion' | 'Both',
                               })
                             }
                             className={`w-full text-xs font-medium px-2 py-1 border rounded ${
                               s.modeOfPayment === 'Cash'
                                 ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                : 'bg-purple-50 text-purple-700 border-purple-200'
+                                : s.modeOfPayment === 'Conversion'
+                                  ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                  : 'bg-indigo-50 text-indigo-800 border-indigo-300'
                             }`}
                           >
                             <option value="Cash">Cash (Subscription Contract)</option>
                             <option value="Conversion">Conversion (Deed of Assignment)</option>
+                            <option value="Both">Both: Cash &amp; Conversion (Same Person)</option>
                           </select>
+
+                          {s.modeOfPayment === 'Conversion' && (
+                            <div className="mt-2 p-2 bg-purple-50/80 border border-purple-200 rounded-md text-left">
+                              <label className="block text-[11px] font-semibold text-purple-900 mb-1">
+                                In the form of (Deed of Assignment):
+                              </label>
+                              <input
+                                type="text"
+                                value={s.liabilityDescription || ''}
+                                onChange={e =>
+                                  updateSubscriber(s.id, {
+                                    liabilityDescription: e.target.value,
+                                  })
+                                }
+                                placeholder="e.g. Advances from Stockholders / Loans Payable"
+                                className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+                              />
+                            </div>
+                          )}
+
+                          {s.modeOfPayment === 'Both' && (
+                            <div className="mt-2 p-2.5 bg-indigo-50/70 border border-indigo-200 rounded-md text-left space-y-2.5">
+                              {/* Cash Portion */}
+                              <div className="p-2 bg-white border border-blue-200 rounded">
+                                <div className="text-[11px] font-bold text-blue-800 mb-1.5">
+                                  1. Cash Portion (Subscription Contract)
+                                </div>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                      Cash Shares
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={s.cashShares ?? 0}
+                                      onChange={e =>
+                                        updateSubscriber(s.id, {
+                                          cashShares: parseFloat(e.target.value) || 0,
+                                        })
+                                      }
+                                      className="w-full text-right px-1.5 py-1 border border-slate-300 rounded text-xs"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                      Cash Paid (Php)
+                                    </label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={s.cashAmountPaid ?? 0}
+                                      onChange={e =>
+                                        updateSubscriber(s.id, {
+                                          cashAmountPaid: parseFloat(e.target.value) || 0,
+                                        })
+                                      }
+                                      className="w-full text-right px-1.5 py-1 border border-slate-300 rounded text-xs font-semibold"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+
+                              {/* Conversion Portion */}
+                              <div className="p-2 bg-white border border-purple-200 rounded">
+                                <div className="text-[11px] font-bold text-purple-800 mb-1.5">
+                                  2. Conversion Portion (Deed of Assignment)
+                                </div>
+                                <div className="grid grid-cols-2 gap-1.5 mb-2">
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                      Conv. Shares
+                                    </label>
+                                    <input
+                                      type="number"
+                                      value={s.conversionShares ?? 0}
+                                      onChange={e =>
+                                        updateSubscriber(s.id, {
+                                          conversionShares: parseFloat(e.target.value) || 0,
+                                        })
+                                      }
+                                      className="w-full text-right px-1.5 py-1 border border-slate-300 rounded text-xs"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                      Conv. Paid (Php)
+                                    </label>
+                                    <input
+                                      type="number"
+                                      step="0.01"
+                                      value={s.conversionAmountPaid ?? 0}
+                                      onChange={e =>
+                                        updateSubscriber(s.id, {
+                                          conversionAmountPaid: parseFloat(e.target.value) || 0,
+                                        })
+                                      }
+                                      className="w-full text-right px-1.5 py-1 border border-slate-300 rounded text-xs font-semibold"
+                                    />
+                                  </div>
+                                </div>
+                                <label className="block text-[10px] font-semibold text-purple-900 mb-1">
+                                  In the form of (Deed of Assignment):
+                                </label>
+                                <input
+                                  type="text"
+                                  value={s.liabilityDescription || ''}
+                                  onChange={e =>
+                                    updateSubscriber(s.id, {
+                                      liabilityDescription: e.target.value,
+                                    })
+                                  }
+                                  placeholder="e.g. Advances from Stockholders / Loans Payable"
+                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                />
+                              </div>
+                            </div>
+                          )}
                         </td>
-                        <td className="p-2">
-                          <input
-                            type="text"
-                            value={s.evidenceId}
-                            onChange={e => updateSubscriber(s.id, { evidenceId: e.target.value })}
-                            placeholder="Passport / DL / UMID"
-                            className="w-full px-2 py-1 border border-slate-300 rounded text-xs"
-                          />
+                        <td className="p-2 align-top space-y-1.5">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-600 mb-0.5">
+                              TIN (Auto-used as Evidence of ID)
+                            </label>
+                            <input
+                              type="text"
+                              value={s.tin || ''}
+                              onChange={e => updateSubscriber(s.id, { tin: e.target.value })}
+                              placeholder="e.g. 123-456-789-000"
+                              className="w-full px-2 py-1 border border-slate-300 rounded text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-slate-500 mb-0.5">
+                              Competent Evidence of Identity
+                            </label>
+                            <input
+                              type="text"
+                              value={s.evidenceId}
+                              onChange={e => updateSubscriber(s.id, { evidenceId: e.target.value })}
+                              placeholder="TIN / Passport / DL / UMID"
+                              className="w-full px-2 py-1 border border-slate-300 rounded text-xs"
+                            />
+                          </div>
                         </td>
-                        <td className="p-2 text-center">
+                        <td className="p-2 text-center align-top">
                           <button
                             type="button"
                             onClick={() => removeSubscriber(s.id)}

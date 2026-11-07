@@ -14,7 +14,7 @@ export interface CurrentStockholder {
   amountPaid: number;
 }
 
-export type PaymentMode = 'Cash' | 'Conversion';
+export type PaymentMode = 'Cash' | 'Conversion' | 'Both';
 
 export interface Subscriber {
   id: string;
@@ -25,9 +25,15 @@ export interface Subscriber {
   subscriptionPricePerShare: number;
   amountPaid: number;
   modeOfPayment: PaymentMode;
+  tin?: string;
   evidenceId: string;
   // Detail for conversion
-  liabilityDescription?: string; // e.g. "Deposits for Future Stock Subscriptions" or "Advances from Stockholder"
+  liabilityDescription?: string; // e.g. "Advances from Stockholder"
+  // Breakdown when modeOfPayment === 'Both'
+  cashShares?: number;
+  cashAmountPaid?: number;
+  conversionShares?: number;
+  conversionAmountPaid?: number;
 }
 
 export interface SecFormData {
