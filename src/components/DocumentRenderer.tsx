@@ -1,11 +1,68 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { SecFormData } from '../types';
 import { formatPesos, fmtNum, fmtShares } from '../utils/numberToWords';
 
 interface DocumentRendererProps {
   data: SecFormData;
   onToggleCheck?: (key: 'chkSec37' | 'chkSec38' | 'chkSec42') => void;
+  fitMobileScreen?: boolean;
 }
+
+const A4_WIDTH_PX = 794; // 210mm at 96dpi
+const A4_MIN_HEIGHT_PX = 1123; // 297mm at 96dpi
+
+const ScaledA4Page: React.FC<{ scale: number; children: React.ReactNode }> = ({
+  scale,
+  children,
+}) => {
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [pageHeight, setPageHeight] = useState<number>(A4_MIN_HEIGHT_PX);
+
+  useLayoutEffect(() => {
+    const el = pageRef.current;
+    if (!el) return;
+    const updateH = () => {
+      setPageHeight(el.offsetHeight || A4_MIN_HEIGHT_PX);
+    };
+    updateH();
+    if (typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(updateH);
+      ro.observe(el);
+      return () => ro.disconnect();
+    }
+  }, [children, scale]);
+
+  const isScaled = scale < 0.995;
+
+  return (
+    <div
+      className="a4-scale-outer relative mx-auto print:!w-[210mm] print:!h-auto"
+      style={
+        isScaled
+          ? {
+              width: `${Math.round(A4_WIDTH_PX * scale)}px`,
+              height: `${Math.round(pageHeight * scale)}px`,
+            }
+          : undefined
+      }
+    >
+      <div
+        ref={pageRef}
+        style={
+          isScaled
+            ? {
+                transform: `scale(${scale})`,
+                transformOrigin: 'top left',
+              }
+            : undefined
+        }
+        className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]"
+      >
+        {children}
+      </div>
+    </div>
+  );
+};
 
 type UCPageBlock =
   | { type: 'intro' }
@@ -25,7 +82,30 @@ type UCSigBlock =
   | { type: 'idTable'; rowIndices: number[]; showHeader: boolean }
   | { type: 'notaryBlock' };
 
-export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onToggleCheck }) => {
+export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
+  data,
+  onToggleCheck,
+  fitMobileScreen = true,
+}) => {
+  const [screenScale, setScreenScale] = useState<number>(1);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (typeof window === 'undefined') return;
+      const vw = window.innerWidth;
+      if (vw < 830) {
+        const availableWidth = Math.max(300, vw - 24);
+        setScreenScale(Math.min(1, availableWidth / A4_WIDTH_PX));
+      } else {
+        setScreenScale(1);
+      }
+    };
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, []);
+
+  const effectiveScale = fitMobileScreen ? screenScale : 1;
   const par = Number(data.parValue) || 100;
   const oldShares = Number(data.oldShares) || 0;
   const newShares = Number(data.newShares) || 0;
@@ -1107,7 +1187,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
   );
 
   return (
-    <div className="flex flex-col items-center gap-8 py-6 print:p-0 print:m-0 print:gap-0 print:block">
+    <div className="flex flex-col items-center gap-4 sm:gap-8 py-2 sm:py-6 overflow-x-auto max-w-full print:overflow-visible print:p-0 print:m-0 print:gap-0 print:block">
       {/* ================================================================= */}
       {/* OFFSCREEN MEASUREMENT CONTAINER FOR EXACT A4 PAGINATION           */}
       {/* ================================================================= */}
@@ -1223,10 +1303,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
       {/* 1. UNIFIED CERTIFICATION - AUTO-PAGINATED BODY PAGES              */}
       {/* ================================================================= */}
       {ucBodyPages.map((pageBlocks, pageIdx) => (
-        <div
-          key={`uc-body-page-${pageIdx}`}
-          className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]"
-        >
+        <ScaledA4Page key={`uc-body-page-${pageIdx}`} scale={effectiveScale}>
           {pageBlocks.map((blk, blkIdx) => {
             switch (blk.type) {
               case 'intro':
@@ -1288,17 +1365,14 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                 return null;
             }
           })}
-        </div>
+        </ScaledA4Page>
       ))}
 
       {/* ================================================================= */}
       {/* 1. UNIFIED CERTIFICATION - SEPARATE SIGNATURE PAGE(S)             */}
       {/* ================================================================= */}
       {ucSigPages.map((sigBlocks, pageIdx) => (
-        <div
-          key={`uc-sig-page-${pageIdx}`}
-          className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]"
-        >
+        <ScaledA4Page key={`uc-sig-page-${pageIdx}`} scale={effectiveScale}>
           {sigBlocks.map((blk, blkIdx) => {
             switch (blk.type) {
               case 'sigIntro':
@@ -1386,13 +1460,13 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                 return null;
             }
           })}
-        </div>
+        </ScaledA4Page>
       ))}
 
       {/* ================================================================= */}
       {/* 2. TREASURER'S AFFIDAVIT                                          */}
       {/* ================================================================= */}
-      <div className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]">
+      <ScaledA4Page scale={effectiveScale}>
         <div className="text-left font-normal leading-snug mb-5">
           Republic of the Philippines )<br />
           {data.execCity}{' '}
@@ -1466,7 +1540,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
             Series of {execYear}.
           </div>
         </div>
-      </div>
+      </ScaledA4Page>
 
       {/* ================================================================= */}
       {/* 3. SUBSCRIPTION CONTRACT (FOR CASH) - 2 PAGES EACH                */}
@@ -1477,7 +1551,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
         return (
           <React.Fragment key={sub.id}>
             {/* Page 1: Subscription Contract Body */}
-            <div className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]">
+            <ScaledA4Page scale={effectiveScale}>
               <h2 className="text-center font-bold text-[12pt] uppercase tracking-wide my-2">
                 SUBSCRIPTION CONTRACT
               </h2>
@@ -1561,10 +1635,10 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
               <p className="indent-10 text-justify mb-2">
                 4. The parties hereby confirm the foregoing upon signing of this Agreement.
               </p>
-            </div>
+            </ScaledA4Page>
 
             {/* Page 2: Subscription Contract Signatures (Separate Following Page) */}
-            <div className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]">
+            <ScaledA4Page scale={effectiveScale}>
               <p className="indent-10 text-justify mb-4">
                 IN WITNESS WHEREOF, the parties have hereunto set their hands this {execDay} day of{' '}
                 {execMonthYear} at {data.execCity}, Philippines.
@@ -1682,7 +1756,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                   Series of {execYear}.
                 </div>
               </div>
-            </div>
+            </ScaledA4Page>
           </React.Fragment>
         );
       })}
@@ -1698,7 +1772,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
         return (
           <React.Fragment key={sub.id}>
             {/* Page 1: Deed of Assignment Body */}
-            <div className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]">
+            <ScaledA4Page scale={effectiveScale}>
               <h2 className="text-center font-bold text-[12pt] uppercase tracking-wide my-2">
                 DEED OF ASSIGNMENT
               </h2>
@@ -1760,10 +1834,10 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                 shares at a subscription price of{' '}
                 <b>{formatPesos(sub.subscriptionPricePerShare)}</b> per share.
               </p>
-            </div>
+            </ScaledA4Page>
 
             {/* Page 2: Deed of Assignment Signatures (Separate Following Page) */}
-            <div className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]">
+            <ScaledA4Page scale={effectiveScale}>
               <p className="indent-10 text-justify mb-4">
                 IN WITNESS WHEREOF, the parties have caused this Deed to be signed in their
                 respective names this {execDay} day of {execMonthYear} at {data.execCity},
@@ -1890,7 +1964,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({ data, onTogg
                   Series of {execYear}.
                 </div>
               </div>
-            </div>
+            </ScaledA4Page>
           </React.Fragment>
         );
       })}

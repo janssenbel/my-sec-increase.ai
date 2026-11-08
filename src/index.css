@@ -1,6 +1,11 @@
 @import "tailwindcss";
 
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
   /* Prevent table headers from ever repeating automatically across page breaks */
   thead {
     display: table-row-group;
@@ -12,6 +17,15 @@
     word-wrap: break-word;
     word-break: break-word;
     vertical-align: middle;
+  }
+}
+
+/* Prevent iOS Safari automatic zoom when focusing form inputs on iPhone (< 768px) */
+@media screen and (max-width: 767px) {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
   }
 }
 
@@ -69,6 +83,16 @@
     vertical-align: middle !important;
   }
 
+  .a4-scale-outer {
+    width: 210mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+
   .a4-page {
     width: 210mm !important;
     min-height: 297mm !important;
@@ -81,9 +105,11 @@
     break-after: page !important;
     box-sizing: border-box !important;
     position: relative !important;
+    transform: none !important;
   }
 
-  .a4-page:last-child {
+  .a4-page:last-child,
+  .a4-scale-outer:last-child .a4-page {
     page-break-after: auto !important;
     break-after: auto !important;
   }

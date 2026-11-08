@@ -15,17 +15,26 @@ import {
   Edit3,
   Calendar,
   Layers,
-  HelpCircle,
+  Maximize2,
+  Minimize2,
 } from 'lucide-react';
 import { SecFormData, CurrentStockholder, Director, Subscriber } from './types';
 import { initialFormData } from './utils/initialData';
-import { fmtNum, fmtShares } from './utils/numberToWords';
+import { fmtNum } from './utils/numberToWords';
 import { exportToWordA4 } from './utils/wordExport';
 import { DocumentRenderer } from './components/DocumentRenderer';
 
 export default function App() {
   const [formData, setFormData] = useState<SecFormData>(initialFormData);
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
+  const [fitMobileScreen, setFitMobileScreen] = useState<boolean>(true);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // Calculations for SEC 25-25 Compliance
   const par = Number(formData.parValue) || 0;
@@ -242,71 +251,74 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans print:bg-white print:block print:min-h-0">
-      {/* Top Application Header */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-50 shadow-md print:hidden no-print">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-600 rounded-lg text-white">
-              <Building2 className="w-5 h-5" />
+      {/* Top Application Header (Compact on iPhone to respect 15% sticky height cap) */}
+      <header className="bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800 sticky top-0 z-50 shadow-md print:hidden no-print">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="p-2 bg-blue-600 rounded-xl text-white shrink-0">
+              <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h1 className="text-base font-bold tracking-tight text-white leading-tight">
-                SEC Capital Increase Document Generator
+            <div className="min-w-0">
+              <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight truncate">
+                SEC Capital Increase Generator
               </h1>
-              <p className="text-xs text-slate-400">
-                Philippine SEC Increase in Authorized Capital Stock &bull; A4 Legal Compliant
+              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+                PH SEC Increase in ACS &bull; A4 Legal Compliant
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-slate-800 p-1 rounded-lg border border-slate-700">
+            <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
               <button
                 type="button"
                 onClick={() => setViewMode('form')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   viewMode === 'form'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-300 hover:text-white'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
-                Form Editor
+                <span>Form</span>
+                <span className="hidden sm:inline">Editor</span>
               </button>
               <button
                 type="button"
-                onClick={() => setViewMode('preview')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                onClick={() => {
+                  setViewMode('preview');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   viewMode === 'preview'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-slate-300 hover:text-white'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                Document Preview
+                <span>Preview</span>
               </button>
             </div>
 
-            {/* Word Export A4 */}
+            {/* Desktop Export Buttons (Hidden on mobile since mobile has the thumb-zone bottom bar) */}
             <button
               type="button"
               onClick={() => exportToWordA4(formData)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-md shadow-sm transition-colors"
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
               title="Download Microsoft Word .doc formatted strictly to A4 size with page breaks"
             >
               <Download className="w-3.5 h-3.5" />
               Download Word (.doc) A4
             </button>
 
-            {/* Print / Save PDF */}
             <button
               type="button"
               onClick={() => {
                 setViewMode('preview');
                 setTimeout(() => window.print(), 50);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-md shadow-sm transition-colors"
+              className="hidden md:flex items-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
             >
               <Printer className="w-3.5 h-3.5" />
               Print / Save PDF (A4)
@@ -315,32 +327,32 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
+      {/* Main Content Area (Extra bottom padding on mobile so thumb bar never overlaps content) */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 pt-3 pb-24 sm:px-4 md:p-6 md:pb-10 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
         {/* Compliance & Summary Banner */}
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-4 mb-6 print:hidden no-print">
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
             <div className="flex items-start sm:items-center gap-3">
               <div
-                className={`p-2.5 rounded-lg ${
+                className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${
                   isSubCompliant && isPaidCompliant
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                     : 'bg-amber-50 text-amber-700 border border-amber-200'
                 }`}
               >
                 {isSubCompliant && isPaidCompliant ? (
-                  <CheckCircle2 className="w-6 h-6" />
+                  <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6" />
                 ) : (
-                  <AlertTriangle className="w-6 h-6" />
+                  <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
                 )}
               </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <h3 className="text-sm font-bold text-slate-900">
-                    SEC 25%-25% Statutory Capital Rule Check
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                    SEC 25%-25% Statutory Capital Rule
                   </h3>
                   <span
-                    className={`text-[11px] font-semibold px-2 py-0.5 rounded ${
+                    className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
                       isSubCompliant && isPaidCompliant
                         ? 'bg-emerald-100 text-emerald-800'
                         : 'bg-amber-100 text-amber-800'
@@ -349,18 +361,18 @@ export default function App() {
                     {isSubCompliant && isPaidCompliant ? 'Compliant' : 'Review Required'}
                   </span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1 flex flex-wrap gap-x-4 gap-y-1">
+                <div className="text-xs text-slate-600 mt-1.5 grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1">
                   <span>
-                    Increase: <b>Php {fmtNum(increase)}</b>
+                    Increase: <b className="text-slate-900">Php {fmtNum(increase)}</b>
                   </span>
                   <span>
-                    25% Subscribed Req:&nbsp;
+                    25% Subscribed:&nbsp;
                     <span className={isSubCompliant ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'}>
                       Php {fmtNum(reqSubscribed25)} (Actual: Php {fmtNum(totalSubscribed)})
                     </span>
                   </span>
                   <span>
-                    25% Paid-Up Req:&nbsp;
+                    25% Paid-Up:&nbsp;
                     <span className={isPaidCompliant ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'}>
                       Php {fmtNum(reqPaid25)} (Actual: Php {fmtNum(totalPaid)})
                     </span>
@@ -370,22 +382,22 @@ export default function App() {
             </div>
 
             {/* Documents Generated Info */}
-            <div className="flex items-center gap-2 text-xs border-t lg:border-t-0 pt-3 lg:pt-0 border-slate-100">
-              <span className="text-slate-500">Auto-Generated:</span>
-              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded border border-slate-200 font-medium">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100">
+              <span className="text-slate-500 font-medium">Auto-Generated:</span>
+              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-200 font-medium">
                 Unified Cert
               </span>
-              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded border border-slate-200 font-medium">
+              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-200 font-medium">
                 Treasurer&rsquo;s Affidavit
               </span>
               {cashSubCount > 0 && (
-                <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded border border-blue-200 font-medium">
-                  {cashSubCount} Subscription Contract{cashSubCount > 1 ? 's' : ''} (Cash)
+                <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md border border-blue-200 font-medium">
+                  {cashSubCount} Cash Contract{cashSubCount > 1 ? 's' : ''}
                 </span>
               )}
               {convSubCount > 0 && (
-                <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded border border-purple-200 font-medium">
-                  {convSubCount} Deed{convSubCount > 1 ? 's' : ''} of Assignment (Debt)
+                <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-md border border-purple-200 font-medium">
+                  {convSubCount} Deed{convSubCount > 1 ? 's' : ''} of Assignment
                 </span>
               )}
             </div>
@@ -396,21 +408,47 @@ export default function App() {
         {/* FORM VIEW                                                      */}
         {/* ============================================================== */}
         {viewMode === 'form' && (
-          <div className="space-y-6 print:hidden no-print">
+          <div className="space-y-4 sm:space-y-6 print:hidden no-print">
+            {/* Mobile Quick-Jump Section Bar */}
+            <div className="md:hidden -mx-3 px-3 overflow-x-auto no-scrollbar">
+              <div className="flex items-center gap-2 pb-1 min-w-max">
+                {[
+                  { id: 'sec-1-corp', label: '1. Corp Info' },
+                  { id: 'sec-2-acs', label: '2. Capital (ACS)' },
+                  { id: 'sec-3-stock', label: '3. Current Stock' },
+                  { id: 'sec-4-meetings', label: '4. Meetings' },
+                  { id: 'sec-5-officers', label: '5. Officers & BOD' },
+                  { id: 'sec-6-subs', label: '6. Subscriptions' },
+                ].map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => scrollToSection(item.id)}
+                    className="px-3 py-2 min-h-[38px] bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 active:bg-blue-50 active:border-blue-300 active:text-blue-700 shadow-2xs shrink-0"
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* 1. Corporate Details Card */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
-              <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2 text-blue-900 font-semibold text-base">
-                  <Building2 className="w-5 h-5 text-blue-600" />
-                  <span>1. Corporate Information & Venue of Execution</span>
+            <section
+              id="sec-1-corp"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
+              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
+                  <Building2 className="w-5 h-5 text-blue-600 shrink-0" />
+                  <span>1. Corporate Information &amp; Venue</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleResetSample}
-                  className="flex items-center gap-1 text-xs text-slate-500 hover:text-slate-800 transition-colors"
+                  className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors shrink-0"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  Reset Defaults
+                  <span>Reset</span>
                 </button>
               </div>
 
@@ -482,9 +520,12 @@ export default function App() {
             </section>
 
             {/* 2. Capital Stock Details Card */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
-              <div className="flex items-center gap-2 text-blue-900 font-semibold text-base mb-4 border-b border-slate-100 pb-3">
-                <Coins className="w-5 h-5 text-blue-600" />
+            <section
+              id="sec-2-acs"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
+              <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 pb-3">
+                <Coins className="w-5 h-5 text-blue-600 shrink-0" />
                 <span>2. Authorized Capital Stock (ACS) Structure</span>
               </div>
 
@@ -512,7 +553,7 @@ export default function App() {
                     onChange={e => updateField('oldShares', parseFloat(e.target.value) || 0)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 mt-0.5 block">
                     Previous ACS: Php {fmtNum(oldAcs)}
                   </span>
                 </div>
@@ -527,7 +568,7 @@ export default function App() {
                     onChange={e => updateField('newShares', parseFloat(e.target.value) || 0)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700"
                   />
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 mt-0.5 block">
                     New ACS: Php {fmtNum(newAcs)}
                   </span>
                 </div>
@@ -535,28 +576,143 @@ export default function App() {
             </section>
 
             {/* 3. Present Capital Stock (Item 3 Table) */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
-              <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+            <section
+              id="sec-3-stock"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
+              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-base">
-                    <Layers className="w-5 h-5 text-blue-600" />
-                    <span>3. Present Capital Stock (Current Shareholdings - Item 3 Table)</span>
+                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
+                    <Layers className="w-5 h-5 text-blue-600 shrink-0" />
+                    <span>3. Present Capital Stock (Item 3 Table)</span>
                   </div>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    Details of the capital stock as of the stockholders&rsquo; meeting approving the increase.
+                    Current shareholdings as of the stockholders&rsquo; meeting approving the increase.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={addCurrentStockholder}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-lg border border-blue-200 transition-colors"
+                  className="hidden sm:flex items-center gap-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl border border-blue-200 transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Stockholder
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Stacked Cards for Current Stockholders (< 768px) */}
+              <div className="md:hidden space-y-3">
+                {formData.currentStockholders.map((s, idx) => (
+                  <div
+                    key={s.id}
+                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                        Stockholder #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeCurrentStockholder(s.id)}
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Stockholder"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        Name and Nationality
+                      </label>
+                      <input
+                        type="text"
+                        value={s.nameAndNationality}
+                        onChange={e =>
+                          updateCurrentStockholder(s.id, { nameAndNationality: e.target.value })
+                        }
+                        placeholder="JUAN DELA CRUZ (Filipino)"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Class of Shares
+                        </label>
+                        <input
+                          type="text"
+                          value={s.shareClass}
+                          onChange={e =>
+                            updateCurrentStockholder(s.id, { shareClass: e.target.value })
+                          }
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          No. of Shares
+                        </label>
+                        <input
+                          type="number"
+                          value={s.shares}
+                          onChange={e =>
+                            updateCurrentStockholder(s.id, {
+                              shares: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-right"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Subscribed (Php)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.amountSubscribed}
+                          onChange={e =>
+                            updateCurrentStockholder(s.id, {
+                              amountSubscribed: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-right"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Paid-up (Php)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.amountPaid}
+                          onChange={e =>
+                            updateCurrentStockholder(s.id, {
+                              amountPaid: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm text-right"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addCurrentStockholder}
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Current Stockholder
+                </button>
+              </div>
+
+              {/* Desktop Table for Current Stockholders (>= 768px) */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
                   <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                     <tr>
@@ -647,7 +803,7 @@ export default function App() {
               </div>
 
               {/* Treasury Shares Option */}
-              <div className="mt-4 p-3 bg-slate-50 border border-slate-200 rounded-lg grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-600 mb-1">
                     Treasury Shares (No. of Shares, if any)
@@ -658,7 +814,7 @@ export default function App() {
                     onChange={e =>
                       updateField('treasuryShares', parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-2.5 py-1 text-xs border border-slate-300 rounded"
+                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
                   />
                 </div>
                 <div>
@@ -672,7 +828,7 @@ export default function App() {
                     onChange={e =>
                       updateField('treasurySubscribed', parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-2.5 py-1 text-xs border border-slate-300 rounded"
+                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
                   />
                 </div>
                 <div>
@@ -686,14 +842,17 @@ export default function App() {
                     onChange={e =>
                       updateField('treasuryPaid', parseFloat(e.target.value) || 0)
                     }
-                    className="w-full px-2.5 py-1 text-xs border border-slate-300 rounded"
+                    className="w-full px-3 py-1.5 text-xs border border-slate-300 rounded-lg bg-white"
                   />
                 </div>
               </div>
             </section>
 
             {/* 4. Meetings & Statutory Compliance Checkboxes */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
+            <section
+              id="sec-4-meetings"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
               <div className="flex items-center gap-2 text-blue-900 font-semibold text-base mb-4 border-b border-slate-100 pb-3">
                 <Calendar className="w-5 h-5 text-blue-600" />
                 <span>4. Meetings & Item 6 Statutory Compliance Boxes</span>
@@ -804,14 +963,17 @@ export default function App() {
             </section>
 
             {/* 5. Officers & Directors Card */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
-              <div className="flex items-center gap-2 text-blue-900 font-semibold text-base mb-4 border-b border-slate-100 pb-3">
-                <Users className="w-5 h-5 text-blue-600" />
-                <span>5. Officers, Meeting Chairs & Board of Directors</span>
+            <section
+              id="sec-5-officers"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
+              <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 pb-3">
+                <Users className="w-5 h-5 text-blue-600 shrink-0" />
+                <span>5. Officers, Meeting Chairs &amp; Board of Directors</span>
               </div>
 
               {/* Officers */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 mb-6">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     President Name
@@ -902,22 +1064,96 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Directors Table */}
-              <div className="flex items-center justify-between mb-2">
-                <span className="font-semibold text-xs text-slate-800">
+              {/* Directors Header */}
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-semibold text-xs sm:text-sm text-slate-800">
                   Board of Directors (Signatories on Dedicated Following Page)
                 </span>
                 <button
                   type="button"
                   onClick={addDirector}
-                  className="flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900 font-semibold"
+                  className="hidden sm:flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900 font-semibold px-2.5 py-1.5 bg-blue-50 rounded-lg border border-blue-200"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Director
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Stacked Cards for Board of Directors (< 768px) */}
+              <div className="md:hidden space-y-3">
+                {formData.directors.map((d, idx) => (
+                  <div
+                    key={d.id}
+                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2.5"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                        Director #{idx + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeDirector(d.id)}
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Director"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        Director Full Name
+                      </label>
+                      <input
+                        type="text"
+                        value={d.name}
+                        onChange={e => updateDirector(d.id, { name: e.target.value })}
+                        placeholder="Full Name"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          TIN (Auto-fills Evidence of ID)
+                        </label>
+                        <input
+                          type="text"
+                          value={d.tin}
+                          onChange={e => updateDirector(d.id, { tin: e.target.value })}
+                          placeholder="123-456-789-000"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Competent Evidence of Identity
+                        </label>
+                        <input
+                          type="text"
+                          value={d.evidenceId}
+                          onChange={e => updateDirector(d.id, { evidenceId: e.target.value })}
+                          placeholder="TIN / Passport / Driver's License"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addDirector}
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Director
+                </button>
+              </div>
+
+              {/* Desktop Table for Board of Directors (>= 768px) */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
                   <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                     <tr>
@@ -974,12 +1210,15 @@ export default function App() {
             </section>
 
             {/* 6. Subscriptions to the Increase Card */}
-            <section className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 md:p-6">
+            <section
+              id="sec-6-subs"
+              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+            >
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-base">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    <span>6. Subscriptions to the Increase & Document Routing</span>
+                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
+                    <FileText className="w-5 h-5 text-blue-600 shrink-0" />
+                    <span>6. Subscriptions to the Increase &amp; Document Routing</span>
                   </div>
                   <p className="text-xs text-slate-500 mt-1">
                     Select payment mode: <b>Cash</b> generates a Subscription Contract. <b>Conversion</b> generates a Deed of Assignment.
@@ -993,14 +1232,334 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addSubscriber}
-                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors shrink-0"
+                  className="hidden sm:flex items-center gap-1 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Subscriber
                 </button>
               </div>
 
-              <div className="overflow-x-auto">
+              {/* Mobile Stacked Cards for Subscribers (< 768px) */}
+              <div className="md:hidden space-y-4">
+                {formData.subscribers.map((s, idx) => (
+                  <div
+                    key={s.id}
+                    className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3.5 shadow-2xs"
+                  >
+                    <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-800 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                          Subscriber #{idx + 1}
+                        </span>
+                        <span
+                          className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
+                            s.modeOfPayment === 'Cash'
+                              ? 'bg-blue-50 text-blue-700 border-blue-200'
+                              : s.modeOfPayment === 'Conversion'
+                                ? 'bg-purple-50 text-purple-700 border-purple-200'
+                                : 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                          }`}
+                        >
+                          {s.modeOfPayment === 'Both' ? 'Cash + Conversion' : s.modeOfPayment}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeSubscriber(s.id)}
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove Subscriber"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div className="sm:col-span-2">
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Subscriber Full Name
+                        </label>
+                        <input
+                          type="text"
+                          value={s.name}
+                          onChange={e => updateSubscriber(s.id, { name: e.target.value })}
+                          placeholder="Subscriber Name"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm font-semibold"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Nationality
+                        </label>
+                        <input
+                          type="text"
+                          value={s.nationality}
+                          onChange={e => updateSubscriber(s.id, { nationality: e.target.value })}
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        Residential Address
+                      </label>
+                      <input
+                        type="text"
+                        value={s.residentialAddress}
+                        onChange={e =>
+                          updateSubscriber(s.id, { residentialAddress: e.target.value })
+                        }
+                        placeholder="Complete Residential Address"
+                        className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                      />
+                    </div>
+
+                    {/* Payment Mode Selector */}
+                    <div>
+                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                        Mode of Payment &amp; Document Routing
+                      </label>
+                      <select
+                        value={s.modeOfPayment}
+                        onChange={e =>
+                          updateSubscriber(s.id, {
+                            modeOfPayment: e.target.value as 'Cash' | 'Conversion' | 'Both',
+                          })
+                        }
+                        className={`w-full min-h-[44px] text-sm font-semibold px-3 py-2 border rounded-xl ${
+                          s.modeOfPayment === 'Cash'
+                            ? 'bg-blue-50 text-blue-800 border-blue-200'
+                            : s.modeOfPayment === 'Conversion'
+                              ? 'bg-purple-50 text-purple-800 border-purple-200'
+                              : 'bg-indigo-50 text-indigo-900 border-indigo-300'
+                        }`}
+                      >
+                        <option value="Cash">Cash (Subscription Contract)</option>
+                        <option value="Conversion">Conversion (Deed of Assignment)</option>
+                        <option value="Both">Both: Cash &amp; Conversion (Same Person)</option>
+                      </select>
+                    </div>
+
+                    {/* Shares, Price & Paid Grid */}
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Total Shares
+                        </label>
+                        <input
+                          type="number"
+                          value={s.sharesSubscribed}
+                          readOnly={s.modeOfPayment === 'Both'}
+                          onChange={e =>
+                            updateSubscriber(s.id, {
+                              sharesSubscribed: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className={`w-full text-right px-2.5 py-2 border border-slate-300 rounded-lg text-sm ${
+                            s.modeOfPayment === 'Both'
+                              ? 'bg-slate-100 text-slate-600 font-semibold'
+                              : 'bg-white'
+                          }`}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Price / Share
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.subscriptionPricePerShare}
+                          onChange={e =>
+                            updateSubscriber(s.id, {
+                              subscriptionPricePerShare: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className="w-full text-right px-2.5 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Total Paid
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          value={s.amountPaid}
+                          readOnly={s.modeOfPayment === 'Both'}
+                          onChange={e =>
+                            updateSubscriber(s.id, {
+                              amountPaid: parseFloat(e.target.value) || 0,
+                            })
+                          }
+                          className={`w-full text-right px-2.5 py-2 border border-slate-300 rounded-lg text-sm font-semibold ${
+                            s.modeOfPayment === 'Both'
+                              ? 'bg-slate-100 text-slate-700'
+                              : 'bg-white'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Conversion Description on Mobile */}
+                    {s.modeOfPayment === 'Conversion' && (
+                      <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl">
+                        <label className="block text-xs font-semibold text-purple-900 mb-1">
+                          In the form of (Deed of Assignment):
+                        </label>
+                        <input
+                          type="text"
+                          value={s.liabilityDescription || ''}
+                          onChange={e =>
+                            updateSubscriber(s.id, {
+                              liabilityDescription: e.target.value,
+                            })
+                          }
+                          placeholder="e.g. Advances from Stockholders / Loans Payable"
+                          className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-sm text-slate-900 font-medium"
+                        />
+                      </div>
+                    )}
+
+                    {/* Both Cash & Conversion Breakdown on Mobile */}
+                    {s.modeOfPayment === 'Both' && (
+                      <div className="p-3 bg-indigo-50/80 border border-indigo-200 rounded-xl space-y-3">
+                        <div className="p-2.5 bg-white border border-blue-200 rounded-lg">
+                          <div className="text-xs font-bold text-blue-800 mb-2">
+                            1. Cash Portion (Subscription Contract)
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                Cash Shares
+                              </label>
+                              <input
+                                type="number"
+                                value={s.cashShares ?? 0}
+                                onChange={e =>
+                                  updateSubscriber(s.id, {
+                                    cashShares: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-full text-right px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                Cash Paid (Php)
+                              </label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={s.cashAmountPaid ?? 0}
+                                onChange={e =>
+                                  updateSubscriber(s.id, {
+                                    cashAmountPaid: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-full text-right px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold"
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="p-2.5 bg-white border border-purple-200 rounded-lg">
+                          <div className="text-xs font-bold text-purple-800 mb-2">
+                            2. Conversion Portion (Deed of Assignment)
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 mb-2.5">
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                Conv. Shares
+                              </label>
+                              <input
+                                type="number"
+                                value={s.conversionShares ?? 0}
+                                onChange={e =>
+                                  updateSubscriber(s.id, {
+                                    conversionShares: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-full text-right px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                                Conv. Paid (Php)
+                              </label>
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={s.conversionAmountPaid ?? 0}
+                                onChange={e =>
+                                  updateSubscriber(s.id, {
+                                    conversionAmountPaid: parseFloat(e.target.value) || 0,
+                                  })
+                                }
+                                className="w-full text-right px-2.5 py-1.5 border border-slate-300 rounded-lg text-sm font-semibold"
+                              />
+                            </div>
+                          </div>
+                          <label className="block text-[11px] font-semibold text-purple-900 mb-1">
+                            In the form of (Deed of Assignment):
+                          </label>
+                          <input
+                            type="text"
+                            value={s.liabilityDescription || ''}
+                            onChange={e =>
+                              updateSubscriber(s.id, {
+                                liabilityDescription: e.target.value,
+                              })
+                            }
+                            placeholder="e.g. Advances from Stockholders / Loans Payable"
+                            className="w-full px-3 py-1.5 bg-white border border-purple-300 rounded-lg text-sm text-slate-900 font-medium"
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* TIN & Competent Evidence of Identity */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          TIN (Auto-used as Evidence of ID)
+                        </label>
+                        <input
+                          type="text"
+                          value={s.tin || ''}
+                          onChange={e => updateSubscriber(s.id, { tin: e.target.value })}
+                          placeholder="e.g. 123-456-789-000"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                          Competent Evidence of Identity
+                        </label>
+                        <input
+                          type="text"
+                          value={s.evidenceId}
+                          onChange={e => updateSubscriber(s.id, { evidenceId: e.target.value })}
+                          placeholder="TIN / Passport / DL / UMID"
+                          className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+
+                <button
+                  type="button"
+                  onClick={addSubscriber}
+                  className="w-full min-h-[46px] flex items-center justify-center gap-1.5 px-4 py-3 bg-blue-600 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Subscriber
+                </button>
+              </div>
+
+              {/* Desktop Table for Subscribers (>= 768px) */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
                   <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
                     <tr>
@@ -1280,15 +1839,15 @@ export default function App() {
               </div>
             </section>
 
-            {/* Bottom Generate & Preview CTA */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-4 pb-8">
+            {/* Bottom Generate & Preview CTA (Desktop & Tablet) */}
+            <div className="hidden md:flex flex-row items-center justify-center gap-3 pt-4 pb-8">
               <button
                 type="button"
                 onClick={() => {
                   setViewMode('preview');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Eye className="w-4 h-4" />
                 Generate &amp; Preview All Documents
@@ -1300,7 +1859,7 @@ export default function App() {
                   setViewMode('preview');
                   setTimeout(() => window.print(), 50);
                 }}
-                className="w-full sm:w-auto px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Printer className="w-4 h-4" />
                 Save as PDF (A4 Size)
@@ -1309,7 +1868,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => exportToWordA4(formData)}
-                className="w-full sm:w-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Download className="w-4 h-4" />
                 Download as Word (.doc) - A4 Size
@@ -1328,25 +1887,45 @@ export default function App() {
               : 'block'
           }
         >
-          <div className="bg-slate-800 text-white p-3 rounded-xl mb-6 flex flex-wrap items-center justify-between gap-3 text-xs print:hidden no-print">
+          <div className="bg-slate-800 text-white p-3 rounded-2xl mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2.5 text-xs print:hidden no-print">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-200">A4 Document Preview</span>
-              <span className="text-slate-400">
-                &bull; A4 Strict Layout (No Header/Footer) &bull; Auto-Adjusted Multi-Page Tables (No Repeated Table Header)
+              <span className="font-semibold text-slate-100">A4 Document Preview</span>
+              <span className="hidden sm:inline text-slate-400">
+                &bull; A4 Strict Layout (No Header/Footer) &bull; Auto-Adjusted Multi-Page Tables
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
               <button
                 type="button"
                 onClick={() => setViewMode('form')}
-                className="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded text-slate-200 font-medium"
+                className="min-h-[38px] px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-slate-200 font-medium"
               >
-                &larr; Back to Form
+                &larr; Edit Form
               </button>
+
+              {/* Mobile Fit-to-Screen vs 100% Zoom Toggle */}
+              <button
+                type="button"
+                onClick={() => setFitMobileScreen(prev => !prev)}
+                className="md:hidden min-h-[38px] px-3 py-1.5 bg-slate-700 active:bg-slate-600 rounded-xl text-slate-200 font-medium flex items-center gap-1.5"
+              >
+                {fitMobileScreen ? (
+                  <>
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span>100% Zoom</span>
+                  </>
+                ) : (
+                  <>
+                    <Minimize2 className="w-3.5 h-3.5" />
+                    <span>Fit iPhone</span>
+                  </>
+                )}
+              </button>
+
               <button
                 type="button"
                 onClick={() => exportToWordA4(formData)}
-                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded text-white font-semibold flex items-center gap-1"
+                className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white font-semibold items-center gap-1"
               >
                 <Download className="w-3.5 h-3.5" />
                 Word (.doc) A4
@@ -1354,7 +1933,7 @@ export default function App() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded text-white font-semibold flex items-center gap-1"
+                className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-semibold items-center gap-1"
               >
                 <Printer className="w-3.5 h-3.5" />
                 Print / Save PDF (A4)
@@ -1362,9 +1941,61 @@ export default function App() {
             </div>
           </div>
 
-          <DocumentRenderer data={formData} onToggleCheck={handleToggleCheck} />
+          <DocumentRenderer
+            data={formData}
+            onToggleCheck={handleToggleCheck}
+            fitMobileScreen={fitMobileScreen}
+          />
         </div>
       </main>
+
+      {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+        <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto">
+          <button
+            type="button"
+            onClick={() => {
+              const nextMode = viewMode === 'form' ? 'preview' : 'form';
+              setViewMode(nextMode);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="min-h-[44px] px-2.5 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            {viewMode === 'form' ? (
+              <>
+                <Eye className="w-4 h-4 shrink-0" />
+                <span>Preview Docs</span>
+              </>
+            ) : (
+              <>
+                <Edit3 className="w-4 h-4 shrink-0" />
+                <span>Edit Form</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('preview');
+              setTimeout(() => window.print(), 50);
+            }}
+            className="min-h-[44px] px-2.5 py-2 bg-slate-900 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <Printer className="w-4 h-4 shrink-0" />
+            <span>Save PDF (A4)</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => exportToWordA4(formData)}
+            className="min-h-[44px] px-2.5 py-2 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+          >
+            <Download className="w-4 h-4 shrink-0" />
+            <span>Word (.doc)</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
