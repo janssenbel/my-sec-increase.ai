@@ -488,8 +488,8 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:min-h-0">
-      {/* Top Application Header (Compact on iPhone to respect 15% sticky height cap) */}
-      <header className="bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800 sticky top-0 z-50 shadow-md print:hidden no-print">
+      {/* Top Application Header (Scrolls naturally on iPhone so iOS top status-bar blur never covers it; sticky on desktop) */}
+      <header className="bg-slate-900 text-white border-b border-slate-800 pt-[env(safe-area-inset-top)] relative md:sticky md:top-0 z-40 shadow-md print:hidden no-print">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
             <img
@@ -2318,7 +2318,7 @@ export default function App() {
       </main>
 
       {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
         <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto">
           <button
             type="button"
