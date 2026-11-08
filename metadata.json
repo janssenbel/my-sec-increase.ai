@@ -1,6 +1,6 @@
 {
   "name": "SEC Capital Increase Document Generator",
-  "description": "Generate Philippine SEC Increase in Authorized Capital Stock documents with AI-powered Amended Articles of Incorporation generator from uploaded original AOI, Unified Certification, Treasurer's Affidavit, Cash Subscription Contracts, and Deeds of Assignment.",
+  "description": "Generate Philippine SEC Increase in Authorized Capital Stock documents: Unified Directors' Certificate, Treasurer's Affidavit, Cash Subscription Contracts, and Deeds of Assignment with A4 legal formatting and Word/PDF export.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

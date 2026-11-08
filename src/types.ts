@@ -79,19 +79,6 @@ export interface SecFormData {
 
   // 7. Subscribers
   subscribers: Subscriber[];
-
-  // 8. AI-Generated Amended Articles of Incorporation
-  amendedAoi?: AmendedAoiResult | null;
-}
-
-export interface AmendedAoiResult {
-  title: string;
-  corpName: string;
-  amendedArticleName: string;
-  amendedArticleText?: string;
-  summaryOfChanges: string[];
-  fullText: string;
-  generatedAt: string;
 }
 
 export interface SavedCompanyProfile {

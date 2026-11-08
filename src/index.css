@@ -78,14 +78,31 @@
     padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
+    overflow: visible !important;
+    height: auto !important;
+    position: static !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
+  #root,
+  main {
+    overflow: visible !important;
+    height: auto !important;
+    position: static !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: block !important;
+    max-width: none !important;
+    width: 100% !important;
+  }
+
   .no-print,
+  .print\:hidden,
   header,
   nav,
-  footer {
+  footer,
+  aside {
     display: none !important;
   }
 
@@ -114,7 +131,8 @@
     vertical-align: middle !important;
   }
 
-  .a4-scale-outer {
+  .a4-scale-outer,
+  .a4-scale-outer[style] {
     width: 210mm !important;
     height: auto !important;
     min-height: 0 !important;
@@ -122,9 +140,11 @@
     padding: 0 !important;
     overflow: visible !important;
     display: block !important;
+    transform: none !important;
   }
 
-  .a4-page {
+  .a4-page,
+  .a4-page[style] {
     width: 210mm !important;
     min-height: 297mm !important;
     padding: 20mm !important;
