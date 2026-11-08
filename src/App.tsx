@@ -34,7 +34,7 @@ import {
 } from './types';
 import { initialFormData, createBlankFormData } from './utils/initialData';
 import { fmtNum } from './utils/numberToWords';
-import { exportToWordA4 } from './utils/wordExport';
+import { exportDocumentsZip } from './utils/wordExport';
 import { DocumentRenderer } from './components/DocumentRenderer';
 import { CompanyProfileModal } from './components/CompanyProfileModal';
 
@@ -85,6 +85,7 @@ export default function App() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [confirmResetSample, setConfirmResetSample] = useState<boolean>(false);
+  const [isGeneratingZip, setIsGeneratingZip] = useState<boolean>(false);
 
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
   const [fitMobileScreen, setFitMobileScreen] = useState<boolean>(true);
@@ -486,6 +487,23 @@ export default function App() {
 
   const allCash = formData.subscribers.length > 0 && formData.subscribers.every(s => s.modeOfPayment === 'Cash');
 
+  const handleDownloadZip = async (mode: 'both' | 'pdf' | 'word' = 'both') => {
+    if (isGeneratingZip) return;
+    setIsGeneratingZip(true);
+    try {
+      await exportDocumentsZip(formData, mode);
+      const msg =
+        mode === 'both'
+          ? 'Downloaded ZIP with separate PDF & Word files!'
+          : mode === 'pdf'
+            ? 'Downloaded ZIP with separate PDF files!'
+            : 'Downloaded ZIP with separate Word (.doc) files!';
+      triggerSaveToast(msg);
+    } finally {
+      setIsGeneratingZip(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:min-h-0">
       {/* Top Application Header (Scrolls naturally on iPhone so iOS top status-bar blur never covers it; sticky on desktop) */}
@@ -572,15 +590,16 @@ export default function App() {
               </button>
             </div>
 
-            {/* Desktop Export Buttons (Hidden on mobile since mobile has the thumb-zone bottom bar) */}
+            {/* Desktop Export ZIP Buttons (Hidden on mobile since mobile has the thumb-zone bottom bar) */}
             <button
               type="button"
-              onClick={() => exportToWordA4(formData)}
-              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
-              title="Download Microsoft Word .doc formatted strictly to A4 size with page breaks"
+              disabled={isGeneratingZip}
+              onClick={() => handleDownloadZip('both')}
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              title="Download ZIP containing separate PDF and Microsoft Word (.doc) files for every SEC document"
             >
               <Download className="w-3.5 h-3.5" />
-              Download Word (.doc) A4
+              <span>{isGeneratingZip ? 'Generating ZIP...' : 'Download ZIP (PDF & Word)'}</span>
             </button>
 
             <button
@@ -591,10 +610,11 @@ export default function App() {
                 }
                 window.print();
               }}
-              className="hidden md:flex items-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              title="Print all documents"
             >
               <Printer className="w-3.5 h-3.5" />
-              Print / Save PDF (A4)
+              <span>Print</span>
             </button>
 
             </div>
@@ -2212,7 +2232,7 @@ export default function App() {
             </section>
 
             {/* Bottom Generate & Preview CTA (Desktop & Tablet) */}
-            <div className="hidden md:flex flex-row items-center justify-center gap-3 pt-4 pb-8">
+            <div className="hidden md:flex flex-wrap items-center justify-center gap-3 pt-4 pb-8">
               <button
                 type="button"
                 onClick={() => {
@@ -2227,23 +2247,32 @@ export default function App() {
 
               <button
                 type="button"
-                onClick={() => {
-                  setViewMode('preview');
-                  window.print();
-                }}
-                className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                disabled={isGeneratingZip}
+                onClick={() => handleDownloadZip('both')}
+                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-60 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
-                <Printer className="w-4 h-4" />
-                Save as PDF (A4 Size)
+                <Download className="w-4 h-4" />
+                {isGeneratingZip ? 'Generating ZIP...' : 'Download ZIP (Separate PDF & Word)'}
               </button>
 
               <button
                 type="button"
-                onClick={() => exportToWordA4(formData)}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                disabled={isGeneratingZip}
+                onClick={() => handleDownloadZip('pdf')}
+                className="px-5 py-3 bg-slate-800 hover:bg-slate-900 disabled:opacity-60 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
-                <Download className="w-4 h-4" />
-                Download as Word (.doc) - A4 Size
+                <FileText className="w-4 h-4" />
+                PDFs Only (.zip)
+              </button>
+
+              <button
+                type="button"
+                disabled={isGeneratingZip}
+                onClick={() => handleDownloadZip('word')}
+                className="px-5 py-3 bg-slate-700 hover:bg-slate-800 disabled:opacity-60 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <FileText className="w-4 h-4" />
+                Word Only (.zip)
               </button>
             </div>
           </div>
@@ -2265,10 +2294,10 @@ export default function App() {
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-slate-100">A4 Document Preview</span>
                 <span className="hidden sm:inline text-slate-400">
-                  &bull; A4 Strict Layout &bull; Auto-Adjusted Multi-Page Tables
+                  &bull; Separate A4 PDF &amp; Word Files Packaged in ZIP
                 </span>
               </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
+              <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <button
                   type="button"
                   onClick={() => {
@@ -2301,46 +2330,84 @@ export default function App() {
 
                 <button
                   type="button"
-                  onClick={() => exportToWordA4(formData)}
-                  className="hidden sm:flex min-h-[38px] px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                  disabled={isGeneratingZip}
+                  onClick={() => handleDownloadZip('both')}
+                  className="hidden sm:flex min-h-[38px] px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  Word (.doc) A4
+                  <span>{isGeneratingZip ? 'Generating...' : 'Download ZIP (PDF & Word)'}</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isGeneratingZip}
+                  onClick={() => handleDownloadZip('pdf')}
+                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>PDFs (.zip)</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isGeneratingZip}
+                  onClick={() => handleDownloadZip('word')}
+                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                >
+                  <FileText className="w-3.5 h-3.5" />
+                  <span>Word (.zip)</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="hidden sm:flex min-h-[38px] px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                  className="hidden lg:flex min-h-[38px] px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-slate-200 font-semibold items-center gap-1.5 transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  Print / Save PDF (A4)
+                  <span>Print</span>
                 </button>
               </div>
             </div>
 
-            {/* Mobile Dedicated Touch-Friendly Print & PDF Toolbar (< 768px) */}
+            {/* Mobile Dedicated Touch-Friendly ZIP Export Toolbar (< 768px) */}
             <div className="md:hidden pt-2 border-t border-slate-700 space-y-2">
-              <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                disabled={isGeneratingZip}
+                onClick={() => handleDownloadZip('both')}
+                className="w-full min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 disabled:opacity-60 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <Download className="w-4 h-4 shrink-0" />
+                <span>
+                  {isGeneratingZip
+                    ? 'Generating ZIP Package...'
+                    : 'Download ZIP (Separate PDF & Word Files)'}
+                </span>
+              </button>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  disabled={isGeneratingZip}
+                  onClick={() => handleDownloadZip('pdf')}
+                  className="min-h-[40px] px-2.5 py-1.5 bg-blue-600 active:bg-blue-700 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
+                >
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
+                  <span>PDFs (.zip)</span>
+                </button>
+                <button
+                  type="button"
+                  disabled={isGeneratingZip}
+                  onClick={() => handleDownloadZip('word')}
+                  className="min-h-[40px] px-2.5 py-1.5 bg-slate-700 active:bg-slate-600 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
+                >
+                  <FileText className="w-3.5 h-3.5 shrink-0" />
+                  <span>Word (.zip)</span>
+                </button>
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
+                  className="min-h-[40px] px-2.5 py-1.5 bg-slate-700 active:bg-slate-600 text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
                 >
-                  <Printer className="w-4 h-4 shrink-0" />
-                  <span>Print / Save PDF</span>
+                  <Printer className="w-3.5 h-3.5 shrink-0" />
+                  <span>Print</span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => exportToWordA4(formData)}
-                  className="min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
-                >
-                  <Download className="w-4 h-4 shrink-0" />
-                  <span>Word (.doc)</span>
-                </button>
-              </div>
-
-              <div className="p-2 bg-blue-950/70 border border-blue-800/80 rounded-xl text-[11px] text-blue-200 leading-snug">
-                <span className="font-bold text-white">📱 How to Save as PDF on iPhone:</span> Tap <b>Print / Save PDF</b>. When Apple&rsquo;s Print dialog opens, <b>pinch outward with two fingers</b> on the page preview to view the full PDF, then tap the <b>Share icon</b> to Save to Files or send via Mail/AirDrop.
               </div>
             </div>
           </div>
@@ -2356,26 +2423,27 @@ export default function App() {
       {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
       <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
         {viewMode === 'form' ? (
-          <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto">
+          <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
             <button
               type="button"
               onClick={() => {
                 setViewMode('preview');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              className="col-span-2 min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              className="min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Eye className="w-4 h-4 shrink-0" />
-              <span>Preview &amp; Save PDF &rarr;</span>
+              <span>Preview Documents</span>
             </button>
 
             <button
               type="button"
-              onClick={() => exportToWordA4(formData)}
-              className="min-h-[44px] px-2.5 py-2 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1 shadow-xs"
+              disabled={isGeneratingZip}
+              onClick={() => handleDownloadZip('both')}
+              className="min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Download className="w-4 h-4 shrink-0" />
-              <span>Word</span>
+              <span>{isGeneratingZip ? 'Generating...' : 'ZIP (PDF + Word)'}</span>
             </button>
           </div>
         ) : (
@@ -2394,20 +2462,12 @@ export default function App() {
 
             <button
               type="button"
-              onClick={() => window.print()}
-              className="min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
-            >
-              <Printer className="w-4 h-4 shrink-0" />
-              <span>Print / PDF</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => exportToWordA4(formData)}
-              className="min-h-[44px] px-2.5 py-2 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1 shadow-xs"
+              disabled={isGeneratingZip}
+              onClick={() => handleDownloadZip('both')}
+              className="col-span-2 min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Download className="w-4 h-4 shrink-0" />
-              <span>Word</span>
+              <span>{isGeneratingZip ? 'Generating ZIP...' : 'Download ZIP (PDF & Word)'}</span>
             </button>
           </div>
         )}

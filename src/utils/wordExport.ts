@@ -1,8 +1,102 @@
+import JSZip from 'jszip';
 import { SecFormData } from '../types';
 import { formatPesos, fmtNum, fmtShares } from './numberToWords';
+import { generateSeparatePdfs } from './pdfExport';
 
-export function exportToWordA4(data: SecFormData): void {
-  const corpNameSafe = (data.corpName || 'Corporate').replace(/[^a-zA-Z0-9_-]/g, '_');
+export interface GeneratedWordDoc {
+  filename: string;
+  title: string;
+  content: string;
+  blob: Blob;
+}
+
+function wrapInWordA4Html(title: string, bodyContent: string): string {
+  return `<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+        xmlns:w='urn:schemas-microsoft-com:office:word' 
+        xmlns='http://www.w3.org/TR/REC-html40'>
+  <head>
+    <meta charset='utf-8'>
+    <title>${title}</title>
+    <style>
+      @page Section1 {
+        size: 21.0cm 29.7cm; /* Strict A4 size */
+        margin: 2.0cm 2.0cm 2.0cm 2.0cm;
+        mso-header-margin: 0pt;
+        mso-footer-margin: 0pt;
+        mso-paper-source: 0;
+      }
+      div.Section1 {
+        page: Section1;
+      }
+      body {
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 10.5pt;
+        line-height: 1.35;
+        color: #000;
+      }
+      h2 {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 12pt;
+        margin: 4pt 0;
+        font-weight: bold;
+      }
+      h3 {
+        text-align: center;
+        text-transform: uppercase;
+        font-size: 11pt;
+        margin: 3pt 0;
+        font-weight: bold;
+      }
+      h4 {
+        text-align: left;
+        font-size: 10.5pt;
+        margin: 10pt 0 4pt 0;
+        font-weight: bold;
+      }
+      p {
+        margin: 4pt 0;
+        line-height: 1.35;
+      }
+      .venue-block {
+        text-align: left;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 10.5pt;
+        line-height: 1.25;
+        margin-bottom: 14pt;
+      }
+      table.doc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 8pt 0;
+        font-size: 9.5pt;
+        page-break-inside: auto;
+      }
+      table.doc-table tr {
+        page-break-inside: avoid;
+      }
+      table.doc-table td {
+        border: 1pt solid black;
+        padding: 3pt 5pt;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="Section1">
+      ${bodyContent}
+    </div>
+  </body>
+  </html>`;
+}
+
+/**
+ * Generates separate Word (.doc) documents for each SEC filing requirement.
+ */
+export function generateSeparateWordDocs(data: SecFormData): GeneratedWordDoc[] {
+  const corpNameSafe = (data.corpName || 'Corporation')
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
 
   const par = Number(data.parValue) || 100;
   const oldShares = Number(data.oldShares) || 0;
@@ -11,7 +105,6 @@ export function exportToWordA4(data: SecFormData): void {
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
 
-  // Series Year
   const execYear = new Date().getFullYear();
 
   const shMeetingDateStr = data.shMeetingDate
@@ -163,7 +256,6 @@ export function exportToWordA4(data: SecFormData): void {
     }
   });
 
-  // Helper: When TIN is indicated (either directly or on a matching Officer/Director/Subscriber), automatically use it as Competent Evidence of Identity
   const getCompetentEvidence = (tin?: string, evidenceId?: string, personName?: string): string => {
     const cleanTin = (tin || '').trim();
     if (cleanTin) {
@@ -205,11 +297,6 @@ export function exportToWordA4(data: SecFormData): void {
     return 'Competent Evidence of Identity';
   };
 
-  // Checkbox helpers for Item 6
-  const boxHtml = (checked: boolean) =>
-    `<span style="font-family: 'Arial Unicode MS', 'Segoe UI Symbol', Arial; font-size: 11pt; border: 1pt solid #000; padding: 0pt 3pt; display: inline-block; min-width: 12pt; text-align: center; font-weight: bold; line-height: 12pt;">${checked ? '&#10003;' : '&nbsp;'}</span>`;
-
-  // Subscriptions Table Header & Rows (placed inside <tbody> without <thead> so headers do NOT repeat on following pages)
   let subTableHeaderRow = '';
   let subTableRows = '';
 
@@ -276,7 +363,6 @@ export function exportToWordA4(data: SecFormData): void {
       .join('');
   }
 
-  // Directors Signatures
   let dirSignHtml = '';
   for (let i = 0; i < data.directors.length; i += 2) {
     const d1 = data.directors[i];
@@ -322,7 +408,17 @@ export function exportToWordA4(data: SecFormData): void {
 
   const pageBreakWord = `<br clear="all" style="mso-special-character:line-break;page-break-before:always" />`;
 
-  // === DOCUMENT 1: UNIFIED CERTIFICATION BODY ===
+  const docs: GeneratedWordDoc[] = [];
+
+  const createWordDocEntry = (filename: string, title: string, htmlBody: string): GeneratedWordDoc => {
+    const fullHtml = wrapInWordA4Html(title, htmlBody);
+    const blob = new Blob(['\ufeff', fullHtml], {
+      type: 'application/msword;charset=utf-8',
+    });
+    return { filename, title, content: fullHtml, blob };
+  };
+
+  // === DOCUMENT 1: UNIFIED CERTIFICATION ===
   const doc1Body = `
     <div class="venue-block">
       Republic of the Philippines )<br />
@@ -438,7 +534,6 @@ export function exportToWordA4(data: SecFormData): void {
     </p>
   `;
 
-  // === DOCUMENT 1: UNIFIED CERTIFICATION SIGNATURE PAGE (SEPARATE PAGE) ===
   const doc1Signatures = `
     <p style="text-indent: 36pt; text-align: justify;">
       IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this _____ day of _______________ ${execYear} at ____________________, Philippines.
@@ -500,6 +595,14 @@ export function exportToWordA4(data: SecFormData): void {
     </div>
   `;
 
+  docs.push(
+    createWordDocEntry(
+      `01_Unified_Certification_${corpNameSafe}.doc`,
+      `${data.corpName} - Unified Certification`,
+      doc1Body + pageBreakWord + doc1Signatures
+    )
+  );
+
   // === DOCUMENT 2: TREASURER'S AFFIDAVIT ===
   const doc2Treasurer = `
     <div class="venue-block">
@@ -553,10 +656,22 @@ export function exportToWordA4(data: SecFormData): void {
     </div>
   `;
 
-  // === DOCUMENT 3: SUBSCRIPTION CONTRACTS (FOR CASH SUBSCRIBERS) ===
-  const cashContractsHtml = cashSubs.map(sub => {
+  docs.push(
+    createWordDocEntry(
+      `02_Treasurers_Affidavit_${corpNameSafe}.doc`,
+      `${data.corpName} - Treasurer's Affidavit`,
+      doc2Treasurer
+    )
+  );
+
+  // === DOCUMENT 3: SUBSCRIPTION CONTRACTS (SEPARATE FILE PER CASH SUBSCRIBER) ===
+  cashSubs.forEach((sub, idx) => {
     const sSub =
       (Number(sub.sharesSubscribed) || 0) * (Number(sub.subscriptionPricePerShare) || 0);
+    const subSafeName = (sub.name || `Subscriber_${idx + 1}`)
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
 
     const bodyPart = `
       <h2>SUBSCRIPTION CONTRACT</h2>
@@ -701,14 +816,25 @@ export function exportToWordA4(data: SecFormData): void {
       </div>
     `;
 
-    return bodyPart + pageBreakWord + signPart;
+    const prefixNum = String(idx + 1).padStart(2, '0');
+    docs.push(
+      createWordDocEntry(
+        `03_${prefixNum}_Subscription_Contract_${subSafeName}.doc`,
+        `Subscription Contract - ${sub.name}`,
+        bodyPart + pageBreakWord + signPart
+      )
+    );
   });
 
-  // === DOCUMENT 4: DEEDS OF ASSIGNMENT (CONVERSION SUBSCRIBERS) ===
-  const convDeedsHtml = convSubs.map(sub => {
+  // === DOCUMENT 4: DEEDS OF ASSIGNMENT (SEPARATE FILE PER CONVERSION SUBSCRIBER) ===
+  convSubs.forEach((sub, idx) => {
     const sSub =
       (Number(sub.sharesSubscribed) || 0) * (Number(sub.subscriptionPricePerShare) || 0);
     const liabDesc = sub.liabilityDescription?.trim() || '_________________________';
+    const subSafeName = (sub.name || `Assignor_${idx + 1}`)
+      .replace(/[^a-zA-Z0-9_-]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
 
     const bodyPart = `
       <h2>DEED OF ASSIGNMENT</h2>
@@ -842,109 +968,80 @@ export function exportToWordA4(data: SecFormData): void {
       </div>
     `;
 
-    return bodyPart + pageBreakWord + signPart;
+    const prefixNum = String(idx + 1).padStart(2, '0');
+    docs.push(
+      createWordDocEntry(
+        `04_${prefixNum}_Deed_of_Assignment_${subSafeName}.doc`,
+        `Deed of Assignment - ${sub.name}`,
+        bodyPart + pageBreakWord + signPart
+      )
+    );
   });
 
-  // Assemble all sections with page breaks
-  const allSections: string[] = [
-    doc1Body,
-    doc1Signatures,
-    doc2Treasurer,
-    ...cashContractsHtml,
-    ...convDeedsHtml,
-  ];
+  return docs;
+}
 
-  const combinedWordContent = allSections.join(pageBreakWord);
+/**
+ * Generates and downloads a .zip archive containing separate A4 PDF and/or Word (.doc) files
+ * for each SEC Capital Increase document.
+ */
+export async function exportDocumentsZip(
+  data: SecFormData,
+  mode: 'both' | 'pdf' | 'word' = 'both'
+): Promise<void> {
+  const corpNameSafe = (data.corpName || 'Corporate')
+    .replace(/[^a-zA-Z0-9_-]/g, '_')
+    .replace(/_+/g, '_')
+    .replace(/^_|_$/g, '');
 
-  const wordHtmlDocument = `
-    <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-          xmlns:w='urn:schemas-microsoft-com:office:word' 
-          xmlns='http://www.w3.org/TR/REC-html40'>
-    <head>
-      <meta charset='utf-8'>
-      <title>${data.corpName} - SEC Capital Increase Documents</title>
-      <style>
-        @page Section1 {
-          size: 21.0cm 29.7cm; /* Strict A4 size */
-          margin: 1.0in 1.0in 1.0in 1.0in;
-          mso-header-margin: 0pt;
-          mso-footer-margin: 0pt;
-          mso-paper-source: 0;
-        }
-        div.Section1 {
-          page: Section1;
-        }
-        body {
-          font-family: 'Times New Roman', Times, serif;
-          font-size: 10.5pt;
-          line-height: 1.35;
-          color: #000;
-        }
-        h2 {
-          text-align: center;
-          text-transform: uppercase;
-          font-size: 12pt;
-          margin: 4pt 0;
-          font-weight: bold;
-        }
-        h3 {
-          text-align: center;
-          text-transform: uppercase;
-          font-size: 11pt;
-          margin: 3pt 0;
-          font-weight: bold;
-        }
-        h4 {
-          text-align: left;
-          font-size: 10.5pt;
-          margin: 10pt 0 4pt 0;
-          font-weight: bold;
-        }
-        p {
-          margin: 4pt 0;
-          line-height: 1.35;
-        }
-        .venue-block {
-          text-align: left;
-          font-family: 'Times New Roman', Times, serif;
-          font-size: 10.5pt;
-          line-height: 1.25;
-          margin-bottom: 14pt;
-        }
-        table.doc-table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 8pt 0;
-          font-size: 9.5pt;
-          page-break-inside: auto;
-        }
-        table.doc-table tr {
-          page-break-inside: avoid;
-        }
-        table.doc-table td {
-          border: 1pt solid black;
-          padding: 3pt 5pt;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="Section1">
-        ${combinedWordContent}
-      </div>
-    </body>
-    </html>
-  `;
+  const zip = new JSZip();
 
-  const blob = new Blob(['\ufeff', wordHtmlDocument], {
-    type: 'application/msword;charset=utf-8',
-  });
+  if (mode === 'both') {
+    const pdfFolder = zip.folder('PDF');
+    const wordFolder = zip.folder('Word');
 
-  const url = URL.createObjectURL(blob);
+    const pdfDocs = generateSeparatePdfs(data);
+    for (const p of pdfDocs) {
+      pdfFolder?.file(p.filename, p.uint8Array);
+    }
+
+    const wordDocs = generateSeparateWordDocs(data);
+    for (const w of wordDocs) {
+      wordFolder?.file(w.filename, '\ufeff' + w.content);
+    }
+  } else if (mode === 'pdf') {
+    const pdfDocs = generateSeparatePdfs(data);
+    for (const p of pdfDocs) {
+      zip.file(p.filename, p.uint8Array);
+    }
+  } else if (mode === 'word') {
+    const wordDocs = generateSeparateWordDocs(data);
+    for (const w of wordDocs) {
+      zip.file(w.filename, '\ufeff' + w.content);
+    }
+  }
+
+  const zipBlob = await zip.generateAsync({ type: 'blob' });
+  const suffix =
+    mode === 'both'
+      ? 'SEC_Documents_PDF_and_Word'
+      : mode === 'pdf'
+        ? 'SEC_PDF_Documents'
+        : 'SEC_Word_Documents';
+
+  const url = URL.createObjectURL(zipBlob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `${corpNameSafe}_SEC_Capital_Increase_A4.doc`;
+  a.download = `${corpNameSafe}_${suffix}.zip`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+
+/**
+ * Backwards-compatible helper: generates the complete ZIP containing separate PDF and Word documents.
+ */
+export function exportToWordA4(data: SecFormData): void {
+  void exportDocumentsZip(data, 'both');
 }
