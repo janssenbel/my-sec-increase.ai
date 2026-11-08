@@ -4,8 +4,8 @@ export const initialFormData: SecFormData = {
   corpName: 'ACME ENTERPRISES PHILIPPINES INC.',
   formerCorpName: '',
   principalAddress: 'Unit 1802, One Ayala Tower, Ayala Avenue, Makati City, Metro Manila',
-  execCity: 'Makati City',
-  execDate: new Date().toISOString().split('T')[0],
+  execCity: '',
+  execDate: '',
 
   parValue: 100.0,
   oldShares: 10000,
@@ -39,7 +39,7 @@ export const initialFormData: SecFormData = {
     'at the principal office',
   amendedArticle: 'Article VII – Authorized Capital Stock',
   chkSec37: false,
-  chkSec38: true,
+  chkSec38: false,
   chkSec42: false,
 
   presName: 'JUAN DELA CRUZ',
@@ -108,7 +108,7 @@ export function createBlankFormData(): SecFormData {
     formerCorpName: '',
     principalAddress: '',
     execCity: '',
-    execDate: today,
+    execDate: '',
 
     parValue: 100.0,
     oldShares: 0,
@@ -133,7 +133,7 @@ export function createBlankFormData(): SecFormData {
     meetingFormat: 'at the principal office',
     amendedArticle: 'Article VII – Authorized Capital Stock',
     chkSec37: false,
-    chkSec38: true,
+    chkSec38: false,
     chkSec42: false,
 
     presName: '',

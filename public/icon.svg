@@ -10,18 +10,17 @@
       <stop offset="100%" stop-color="#059669" />
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg)" />
-  <rect x="125" y="102" width="220" height="272" rx="28" fill="#f8fafc" />
-  <polygon points="163,196 235,148 307,196" fill="#1e3a8a" />
-  <rect x="163" y="198" width="144" height="12" rx="4" fill="#2563eb" />
-  <rect x="182" y="216" width="16" height="38" rx="4" fill="#1e40af" />
-  <rect x="227" y="216" width="16" height="38" rx="4" fill="#1e40af" />
-  <rect x="272" y="216" width="16" height="38" rx="4" fill="#1e40af" />
-  <rect x="163" y="258" width="144" height="10" rx="4" fill="#1e3a8a" />
-  <rect x="168" y="288" width="134" height="12" rx="6" fill="#94a3b8" />
-  <rect x="168" y="314" width="118" height="12" rx="6" fill="#94a3b8" />
-  <rect x="168" y="340" width="102" height="12" rx="6" fill="#94a3b8" />
-  <circle cx="328" cy="322" r="92" fill="#ffffff" />
-  <circle cx="328" cy="322" r="82" fill="url(#badge)" />
-  <path d="M328 358 V288 M296 318 L328 286 L360 318" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <rect width="512" height="512" fill="url(#bg)" />
+  <rect x="120" y="96" width="228" height="284" rx="28" fill="#ffffff" />
+  <polygon points="160,194 234,144 308,194" fill="#1e3a8a" />
+  <rect x="160" y="196" width="148" height="12" rx="4" fill="#2563eb" />
+  <rect x="180" y="214" width="16" height="40" rx="4" fill="#1e40af" />
+  <rect x="226" y="214" width="16" height="40" rx="4" fill="#1e40af" />
+  <rect x="272" y="214" width="16" height="40" rx="4" fill="#1e40af" />
+  <rect x="160" y="258" width="148" height="10" rx="4" fill="#1e3a8a" />
+  <rect x="166" y="288" width="136" height="12" rx="6" fill="#94a3b8" />
+  <rect x="166" y="314" width="120" height="12" rx="6" fill="#94a3b8" />
+  <rect x="166" y="340" width="104" height="12" rx="6" fill="#94a3b8" />
+  <circle cx="332" cy="326" r="84" fill="url(#badge)" />
+  <path d="M332 362 V290 M298 322 L332 288 L366 322" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none" />
 </svg>

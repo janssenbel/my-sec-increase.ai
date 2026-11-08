@@ -113,11 +113,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
 
-  // Dates
-  const execDateObj = data.execDate ? new Date(data.execDate) : new Date();
-  const execDay = execDateObj.getDate();
-  const execMonthYear = execDateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-  const execYear = execDateObj.getFullYear();
+  // Series Year
+  const execYear = new Date().getFullYear();
 
   const shMeetingDateStr = data.shMeetingDate
     ? new Date(data.shMeetingDate).toLocaleDateString('en-US', {
@@ -1026,9 +1023,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
     <div className="flow-root">
       <div className="text-left font-normal leading-snug mb-3">
         Republic of the Philippines )<br />
-        {data.execCity}{' '}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
-        S.S.
+        _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
       </div>
 
       <h2 className="text-center font-bold text-[12pt] uppercase tracking-wide my-1">
@@ -1228,8 +1223,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
         {/* Signature Page Measurements */}
         <div data-measure-id="uc-sig-intro" className="flow-root">
           <p className="indent-10 text-justify mb-4">
-            IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this {execDay}{' '}
-            day of {execMonthYear} at {data.execCity}, Philippines.
+            IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this _____ day of
+            _______________ {execYear} at ____________________, Philippines.
           </p>
         </div>
 
@@ -1255,8 +1250,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
           className="flow-root border-t border-dashed border-black pt-4 mt-6"
         >
           <p className="text-justify mb-2">
-            SUBSCRIBED AND SWORN to before me this _____ day of _______________ {execYear} in{' '}
-            {data.execCity}, affiants exhibited to me their Competent Evidence of Identity:
+            SUBSCRIBED AND SWORN to before me this _____ day of _______________ {execYear} in
+            ____________________, affiants exhibited to me their Competent Evidence of Identity:
           </p>
         </div>
 
@@ -1378,8 +1373,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
               case 'sigIntro':
                 return (
                   <p key={blkIdx} className="indent-10 text-justify mb-4">
-                    IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this{' '}
-                    {execDay} day of {execMonthYear} at {data.execCity}, Philippines.
+                    IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this
+                    _____ day of _______________ {execYear} at ____________________, Philippines.
                   </p>
                 );
 
@@ -1395,7 +1390,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                   <div key={blkIdx} className="border-t border-dashed border-black pt-4 mt-6">
                     <p className="text-justify mb-2">
                       SUBSCRIBED AND SWORN to before me this _____ day of _______________ {execYear}{' '}
-                      in {data.execCity}, affiants exhibited to me their Competent Evidence of
+                      in ____________________, affiants exhibited to me their Competent Evidence of
                       Identity:
                     </p>
                   </div>
@@ -1469,9 +1464,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
       <ScaledA4Page scale={effectiveScale}>
         <div className="text-left font-normal leading-snug mb-5">
           Republic of the Philippines )<br />
-          {data.execCity}{' '}
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
-          S.S.
+          _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
         </div>
 
         <h2 className="text-center font-bold text-[12pt] uppercase tracking-wide my-2">
@@ -1559,8 +1552,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
 
               <p className="font-bold mb-2">KNOW ALL PERSONS BY THESE PRESENTS:</p>
               <p className="indent-10 text-justify mb-2">
-                This Subscription Contract is made and entered this {execDay} day of {execMonthYear}
-                , at {data.execCity}, Philippines, by and between:
+                This Subscription Contract is made and entered this _____ day of _______________
+                {' '}{execYear}, at ____________________, Philippines, by and between:
               </p>
               <p className="indent-10 text-justify mb-2">
                 <b>{data.corpName.toUpperCase()}</b>, a corporation organized and existing under the
@@ -1640,8 +1633,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
             {/* Page 2: Subscription Contract Signatures (Separate Following Page) */}
             <ScaledA4Page scale={effectiveScale}>
               <p className="indent-10 text-justify mb-4">
-                IN WITNESS WHEREOF, the parties have hereunto set their hands this {execDay} day of{' '}
-                {execMonthYear} at {data.execCity}, Philippines.
+                IN WITNESS WHEREOF, the parties have hereunto set their hands this _____ day of
+                _______________ {execYear} at ____________________, Philippines.
               </p>
 
               <table className="w-full border-none my-8">
@@ -1682,12 +1675,12 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                 <div className="text-center font-bold mb-3">ACKNOWLEDGMENT</div>
                 <div className="text-left font-normal leading-snug mb-4">
                   Republic of the Philippines )<br />
-                  City of {data.execCity} ) S.S.
+                  _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
                 </div>
                 <p className="indent-10 text-justify mb-3">
-                  BEFORE ME, a Notary Public in and for {data.execCity}, Philippines, this _____ day
-                  of _______________ {execYear}, personally appeared the following persons with their
-                  respective Competent Evidence of Identity:
+                  BEFORE ME, a Notary Public in and for ____________________, Philippines, this
+                  _____ day of _______________ {execYear}, personally appeared the following persons
+                  with their respective Competent Evidence of Identity:
                 </p>
                 {(() => {
                   const rawAffiants = [
@@ -1780,8 +1773,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
 
               <p className="font-bold mb-2">KNOW ALL MEN BY THESE PRESENTS:</p>
               <p className="indent-10 text-justify mb-2">
-                This Deed of Assignment made and executed on this {execDay} day of {execMonthYear},
-                by and between:
+                This Deed of Assignment made and executed on this _____ day of _______________
+                {' '}{execYear}, by and between:
               </p>
               <p className="indent-10 text-justify mb-2">
                 <b>{sub.name.toUpperCase()}</b>, of legal age, {sub.nationality}, and with
@@ -1840,8 +1833,8 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
             <ScaledA4Page scale={effectiveScale}>
               <p className="indent-10 text-justify mb-4">
                 IN WITNESS WHEREOF, the parties have caused this Deed to be signed in their
-                respective names this {execDay} day of {execMonthYear} at {data.execCity},
-                Philippines.
+                respective names this _____ day of _______________ {execYear} at
+                ____________________, Philippines.
               </p>
 
               <table className="w-full border-none my-6">
@@ -1892,9 +1885,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                 <div className="text-center font-bold mb-3">ACKNOWLEDGMENT</div>
                 <div className="text-left font-normal leading-snug mb-4">
                   REPUBLIC OF THE PHILIPPINES ]<br />
-                  {data.execCity.toUpperCase()}{' '}
-                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]
-                  S.S.
+                  _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;] S.S.
                 </div>
                 <p className="indent-10 text-justify mb-3">
                   BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____

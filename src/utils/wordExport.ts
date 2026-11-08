@@ -11,11 +11,8 @@ export function exportToWordA4(data: SecFormData): void {
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
 
-  // Dates
-  const execDateObj = data.execDate ? new Date(data.execDate) : new Date();
-  const execDay = execDateObj.getDate();
-  const execMonthYear = execDateObj.toLocaleString('en-US', { month: 'long', year: 'numeric' });
-  const execYear = execDateObj.getFullYear();
+  // Series Year
+  const execYear = new Date().getFullYear();
 
   const shMeetingDateStr = data.shMeetingDate
     ? new Date(data.shMeetingDate).toLocaleDateString('en-US', {
@@ -329,7 +326,7 @@ export function exportToWordA4(data: SecFormData): void {
   const doc1Body = `
     <div class="venue-block">
       Republic of the Philippines )<br />
-      ${data.execCity} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
+      _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
     </div>
 
     <h2>UNIFIED CERTIFICATION FOR INCREASE IN AUTHORIZED CAPITAL STOCK OF</h2>
@@ -444,7 +441,7 @@ export function exportToWordA4(data: SecFormData): void {
   // === DOCUMENT 1: UNIFIED CERTIFICATION SIGNATURE PAGE (SEPARATE PAGE) ===
   const doc1Signatures = `
     <p style="text-indent: 36pt; text-align: justify;">
-      IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this ${execDay} day of ${execMonthYear} at ${data.execCity}, Philippines.
+      IN WITNESS WHEREOF, we have hereunto signed this Unified Certification this _____ day of _______________ ${execYear} at ____________________, Philippines.
     </p>
 
     <table style="width: 100%; border: none; margin-top: 14pt; page-break-inside: auto;">
@@ -479,7 +476,7 @@ export function exportToWordA4(data: SecFormData): void {
     <br /><br />
     <div style="border-top: 1pt dashed #000; padding-top: 14pt; margin-top: 16pt;">
       <p style="text-align: justify;">
-        SUBSCRIBED AND SWORN to before me this _____ day of _______________ ${execYear} in ${data.execCity}, affiants exhibited to me their Competent Evidence of Identity:
+        SUBSCRIBED AND SWORN to before me this _____ day of _______________ ${execYear} in ____________________, affiants exhibited to me their Competent Evidence of Identity:
       </p>
       <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
         <tbody>
@@ -507,7 +504,7 @@ export function exportToWordA4(data: SecFormData): void {
   const doc2Treasurer = `
     <div class="venue-block">
       Republic of the Philippines )<br />
-      ${data.execCity} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
+      _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
     </div>
 
     <h2>TREASURER&rsquo;S AFFIDAVIT</h2>
@@ -566,7 +563,7 @@ export function exportToWordA4(data: SecFormData): void {
       <br />
       <p><b>KNOW ALL PERSONS BY THESE PRESENTS:</b></p>
       <p style="text-indent: 36pt; text-align: justify;">
-        This Subscription Contract is made and entered this ${execDay} day of ${execMonthYear}, at ${data.execCity}, Philippines, by and between:
+        This Subscription Contract is made and entered this _____ day of _______________ ${execYear}, at ____________________, Philippines, by and between:
       </p>
       <p style="text-indent: 36pt; text-align: justify;">
         <b>${data.corpName.toUpperCase()}</b>, a corporation organized and existing under the laws of the Philippines, with principal office address at ${data.principalAddress}, duly represented by its President, <b>${presName}</b>, and Treasurer, <b>${treasName}</b> (referred to herein as &ldquo;the Corporation&rdquo;);
@@ -616,7 +613,7 @@ export function exportToWordA4(data: SecFormData): void {
 
     const signPart = `
       <p style="text-indent: 36pt; text-align: justify;">
-        IN WITNESS WHEREOF, the parties hereto have hereunto set their hands this ${execDay} day of ${execMonthYear} at ${data.execCity}, Philippines.
+        IN WITNESS WHEREOF, the parties hereto have hereunto set their hands this _____ day of _______________ ${execYear} at ____________________, Philippines.
       </p>
       <br /><br />
       <table style="width: 100%; border: none;">
@@ -643,10 +640,10 @@ export function exportToWordA4(data: SecFormData): void {
         <div style="text-align: center; font-weight: bold; margin-bottom: 10pt;">ACKNOWLEDGMENT</div>
         <div class="venue-block">
           Republic of the Philippines )<br />
-          City of ${data.execCity} ) S.S.
+          _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;) S.S.
         </div>
         <p style="text-indent: 36pt; text-align: justify;">
-          BEFORE ME, a Notary Public in and for ${data.execCity}, Philippines, this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
+          BEFORE ME, a Notary Public in and for ____________________, Philippines, this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
         </p>
         <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
           <tbody>
@@ -718,7 +715,7 @@ export function exportToWordA4(data: SecFormData): void {
       <br />
       <p><b>KNOW ALL MEN BY THESE PRESENTS:</b></p>
       <p style="text-indent: 36pt; text-align: justify;">
-        This Deed of Assignment is made and executed on this ${execDay} day of ${execMonthYear}, by and between:
+        This Deed of Assignment is made and executed on this _____ day of _______________ ${execYear}, by and between:
       </p>
       <p style="text-indent: 36pt; text-align: justify;">
         <b>${sub.name.toUpperCase()}</b>, of legal age, ${sub.nationality}, and with residential address at ${sub.residentialAddress}, hereinafter referred to as the &ldquo;<b>ASSIGNOR</b>&rdquo;;
@@ -747,7 +744,7 @@ export function exportToWordA4(data: SecFormData): void {
 
     const signPart = `
       <p style="text-indent: 36pt; text-align: justify;">
-        IN WITNESS WHEREOF, the parties have caused this Deed of Assignment to be signed in their respective names this ${execDay} day of ${execMonthYear} at ${data.execCity}, Philippines.
+        IN WITNESS WHEREOF, the parties have caused this Deed of Assignment to be signed in their respective names this _____ day of _______________ ${execYear} at ____________________, Philippines.
       </p>
       <br /><br />
       <table style="width: 100%; border: none;">
@@ -780,7 +777,7 @@ export function exportToWordA4(data: SecFormData): void {
         <div style="text-align: center; font-weight: bold; margin-bottom: 10pt;">ACKNOWLEDGMENT</div>
         <div class="venue-block">
           REPUBLIC OF THE PHILIPPINES ]<br />
-          ${data.execCity.toUpperCase()} &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;] S.S.
+          _____________________ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;] S.S.
         </div>
         <p style="text-indent: 36pt; text-align: justify;">
           BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:

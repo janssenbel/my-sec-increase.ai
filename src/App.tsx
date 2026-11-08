@@ -40,7 +40,7 @@ import { CompanyProfileModal } from './components/CompanyProfileModal';
 
 const PROFILES_STORAGE_KEY = 'sec-company-profiles-v1';
 const ACTIVE_PROFILE_KEY = 'sec-active-profile-id-v1';
-const ACTIVE_DRAFT_KEY = 'sec-active-draft-v1';
+const ACTIVE_DRAFT_KEY = 'sec-active-draft-v2';
 
 export default function App() {
   const [formData, setFormData] = useState<SecFormData>(() => {
@@ -495,7 +495,7 @@ export default function App() {
             <img
               src={appIconUrl}
               alt="SEC Capital Increase Icon"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-sm shrink-0 border border-white/10"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-sm shrink-0"
             />
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight truncate">
@@ -710,7 +710,7 @@ export default function App() {
               <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
                   <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
-                  <span>1. Corporate Information &amp; Venue</span>
+                  <span>1. Corporate Information</span>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
@@ -882,31 +882,6 @@ export default function App() {
                     onChange={e => updateField('principalAddress', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Unit, Building, Street, Barangay, City, Province"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    City / Venue of Execution <span className="text-slate-400 font-normal">(Aligned Left in Docs)</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.execCity}
-                    onChange={e => updateField('execCity', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="e.g. Makati City"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
-                    Date of Execution
-                  </label>
-                  <input
-                    type="date"
-                    value={formData.execDate}
-                    onChange={e => updateField('execDate', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
