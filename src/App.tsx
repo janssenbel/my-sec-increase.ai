@@ -24,6 +24,7 @@ import {
   BookmarkCheck,
   Check,
   FilePlus2,
+  Sparkles,
 } from 'lucide-react';
 import {
   SecFormData,
@@ -31,12 +32,14 @@ import {
   Director,
   Subscriber,
   SavedCompanyProfile,
+  AmendedAoiResult,
 } from './types';
 import { initialFormData, createBlankFormData } from './utils/initialData';
 import { fmtNum } from './utils/numberToWords';
 import { exportToWordA4 } from './utils/wordExport';
 import { DocumentRenderer } from './components/DocumentRenderer';
 import { CompanyProfileModal } from './components/CompanyProfileModal';
+import { AmendedAoiGenerator } from './components/AmendedAoiGenerator';
 
 const PROFILES_STORAGE_KEY = 'sec-company-profiles-v1';
 const ACTIVE_PROFILE_KEY = 'sec-active-profile-id-v1';
@@ -86,7 +89,7 @@ export default function App() {
   const [saveToast, setSaveToast] = useState<string | null>(null);
   const [confirmResetSample, setConfirmResetSample] = useState<boolean>(false);
 
-  const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
+  const [viewMode, setViewMode] = useState<'form' | 'preview' | 'ai-aoi'>('form');
   const [fitMobileScreen, setFitMobileScreen] = useState<boolean>(true);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
@@ -311,6 +314,16 @@ export default function App() {
   // Handlers for Basic Fields
   const updateField = <K extends keyof SecFormData>(field: K, value: SecFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleUpdateAmendedAoi = (aoi: AmendedAoiResult | null) => {
+    setFormData(prev => {
+      const next: SecFormData = { ...prev, amendedAoi: aoi };
+      if (aoi?.amendedArticleText && aoi.amendedArticleText.trim()) {
+        next.amendedArticle = aoi.amendedArticleText.trim();
+      }
+      return next;
+    });
   };
 
   // Handlers for Item 6 Checkbox Toggling
@@ -554,6 +567,27 @@ export default function App() {
                 <span>Form</span>
                 <span className="hidden sm:inline">Editor</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setViewMode('ai-aoi');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors relative ${
+                  viewMode === 'ai-aoi'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-sm'
+                    : 'text-slate-300 hover:text-white'
+                }`}
+                title="AI Amended Articles of Incorporation Generator"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>AI AOI</span>
+                {formData.amendedAoi && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" title="Amended AOI Ready" />
+                )}
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
@@ -1268,15 +1302,34 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                    Amended Article Provision(s)
-                  </label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                      Amended Article Provision(s)
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setViewMode('ai-aoi');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      <span>Generate Full AOI with AI &rarr;</span>
+                    </button>
+                  </div>
                   <input
                     type="text"
                     value={formData.amendedArticle}
                     onChange={e => updateField('amendedArticle', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                  {formData.amendedAoi && (
+                    <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1 font-medium">
+                      <CheckCircle2 className="w-3 h-3" />
+                      Linked to AI Amended AOI ({formData.amendedAoi.amendedArticleName || 'Article SEVENTH'})
+                    </p>
+                  )}
                 </div>
               </div>
 
@@ -2246,13 +2299,26 @@ export default function App() {
         )}
 
         {/* ============================================================== */}
+        {/* AI AMENDED ARTICLES OF INCORPORATION GENERATOR                 */}
+        {/* ============================================================== */}
+        {viewMode === 'ai-aoi' && (
+          <div className="space-y-4 sm:space-y-6 print:hidden no-print">
+            <AmendedAoiGenerator
+              formData={formData}
+              savedAoi={formData.amendedAoi}
+              onUpdateAmendedAoi={handleUpdateAmendedAoi}
+            />
+          </div>
+        )}
+
+        {/* ============================================================== */}
         {/* DOCUMENT PREVIEW VIEW (Always mounted for A4 measurement/print)*/}
         {/* ============================================================== */}
         <div
           className={
-            viewMode === 'form'
-              ? 'fixed -left-[9999px] top-0 opacity-0 pointer-events-none print:static print:opacity-100 print:pointer-events-auto print:block'
-              : 'block'
+            viewMode === 'preview'
+              ? 'block'
+              : 'fixed -left-[9999px] top-0 opacity-0 pointer-events-none print:static print:opacity-100 print:pointer-events-auto print:block'
           }
         >
           <div className="bg-slate-800 text-white p-3 rounded-2xl mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-2.5 text-xs print:hidden no-print">
@@ -2318,27 +2384,40 @@ export default function App() {
       </main>
 
       {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
-        <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-2.5 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+        <div className="grid grid-cols-4 gap-1.5 max-w-lg mx-auto">
           <button
             type="button"
             onClick={() => {
-              const nextMode = viewMode === 'form' ? 'preview' : 'form';
-              setViewMode(nextMode);
+              setViewMode('form');
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="min-h-[44px] px-2.5 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+            className={`min-h-[44px] px-1.5 py-1.5 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-0.5 transition-colors ${
+              viewMode === 'form'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
           >
-            {viewMode === 'form' ? (
-              <>
-                <Eye className="w-4 h-4 shrink-0" />
-                <span>Preview Docs</span>
-              </>
-            ) : (
-              <>
-                <Edit3 className="w-4 h-4 shrink-0" />
-                <span>Edit Form</span>
-              </>
+            <Edit3 className="w-4 h-4 shrink-0" />
+            <span className="text-[10px]">Form</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setViewMode('ai-aoi');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className={`min-h-[44px] px-1.5 py-1.5 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-0.5 transition-colors relative ${
+              viewMode === 'ai-aoi'
+                ? 'bg-indigo-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
+          >
+            <Sparkles className="w-4 h-4 shrink-0 text-amber-400" />
+            <span className="text-[10px]">AI AOI</span>
+            {formData.amendedAoi && (
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 absolute top-1.5 right-2" />
             )}
           </button>
 
@@ -2346,21 +2425,32 @@ export default function App() {
             type="button"
             onClick={() => {
               setViewMode('preview');
-              setTimeout(() => window.print(), 50);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            className="min-h-[44px] px-2.5 py-2 bg-slate-900 dark:bg-slate-700 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+            className={`min-h-[44px] px-1.5 py-1.5 rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-0.5 transition-colors ${
+              viewMode === 'preview'
+                ? 'bg-blue-600 text-white shadow-xs'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+            }`}
           >
-            <Printer className="w-4 h-4 shrink-0" />
-            <span>Save PDF (A4)</span>
+            <Eye className="w-4 h-4 shrink-0" />
+            <span className="text-[10px]">Docs</span>
           </button>
 
           <button
             type="button"
-            onClick={() => exportToWordA4(formData)}
-            className="min-h-[44px] px-2.5 py-2 bg-emerald-600 active:bg-emerald-700 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+            onClick={() => {
+              if (viewMode === 'ai-aoi') {
+                window.print();
+              } else {
+                setViewMode('preview');
+                setTimeout(() => window.print(), 50);
+              }
+            }}
+            className="min-h-[44px] px-1.5 py-1.5 bg-slate-900 dark:bg-slate-700 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex flex-col items-center justify-center gap-0.5 shadow-xs"
           >
-            <Download className="w-4 h-4 shrink-0" />
-            <span>Word (.doc)</span>
+            <Printer className="w-4 h-4 shrink-0" />
+            <span className="text-[10px]">PDF</span>
           </button>
         </div>
       </div>
