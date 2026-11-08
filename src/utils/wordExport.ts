@@ -105,7 +105,10 @@ export function generateSeparateWordDocs(data: SecFormData): GeneratedWordDoc[] 
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
 
-  const execYear = new Date().getFullYear();
+  const execYear =
+    data.execYear !== undefined && String(data.execYear).trim() !== ''
+      ? String(data.execYear).trim()
+      : String(new Date().getFullYear());
 
   const shMeetingDateStr = data.shMeetingDate
     ? new Date(data.shMeetingDate).toLocaleDateString('en-US', {

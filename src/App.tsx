@@ -896,7 +896,7 @@ export default function App() {
                   />
                 </div>
 
-                <div className="lg:col-span-3">
+                <div className="lg:col-span-2">
                   <label className="block text-xs font-semibold text-slate-700 mb-1">
                     Principal Office Address
                   </label>
@@ -907,6 +907,46 @@ export default function App() {
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Unit, Building, Street, Barangay, City, Province"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Document Execution / Notarial Year
+                  </label>
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      aria-label="Document Execution Year"
+                      value={formData.execYear || String(new Date().getFullYear())}
+                      onChange={e => updateField('execYear', e.target.value)}
+                      className="flex-1 px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="2025">2025</option>
+                      <option value="2026">2026</option>
+                      <option value="2027">2027</option>
+                      <option value="2028">2028</option>
+                      <option value="2029">2029</option>
+                      <option value="2030">2030</option>
+                      <option value="____">Blank (____)</option>
+                    </select>
+                    {(['2026', '2027'] as const).map(yr => {
+                      const currentYr = formData.execYear || String(new Date().getFullYear());
+                      const isActive = currentYr === yr;
+                      return (
+                        <button
+                          key={yr}
+                          type="button"
+                          onClick={() => updateField('execYear', yr)}
+                          className={`px-2.5 py-2 text-xs font-bold rounded-lg border transition-colors shrink-0 ${
+                            isActive
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          {yr}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </section>
@@ -1250,7 +1290,7 @@ export default function App() {
                 <span>4. Meetings &amp; Item 6 Statutory Compliance Boxes</span>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
                 <div>
                   <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Stockholders&rsquo; Meeting Date
@@ -1273,6 +1313,26 @@ export default function App() {
                     onChange={e => updateField('bodMeetingDate', e.target.value)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                    Document Execution / Notarial Year
+                  </label>
+                  <select
+                    aria-label="Document Execution Year"
+                    value={formData.execYear || String(new Date().getFullYear())}
+                    onChange={e => updateField('execYear', e.target.value)}
+                    className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                    <option value="____">Blank (____)</option>
+                  </select>
                 </div>
 
                 <div>
@@ -2291,11 +2351,26 @@ export default function App() {
           {/* Top Control Bar for Preview */}
           <div className="bg-slate-800 text-white p-3 rounded-2xl mb-4 sm:mb-6 space-y-2.5 text-xs print:hidden no-print">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2.5">
                 <span className="font-semibold text-slate-100">A4 Document Preview</span>
-                <span className="hidden sm:inline text-slate-400">
-                  &bull; Separate A4 PDF &amp; Word Files Packaged in ZIP
-                </span>
+                <div className="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 px-2.5 py-1 rounded-xl">
+                  <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                  <span className="text-slate-300 font-medium">Document Year:</span>
+                  <select
+                    aria-label="Document Year in Preview"
+                    value={formData.execYear || String(new Date().getFullYear())}
+                    onChange={e => updateField('execYear', e.target.value)}
+                    className="bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs"
+                  >
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                    <option value="2027">2027</option>
+                    <option value="2028">2028</option>
+                    <option value="2029">2029</option>
+                    <option value="2030">2030</option>
+                    <option value="____">Blank (____)</option>
+                  </select>
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto justify-between sm:justify-end">
                 <button

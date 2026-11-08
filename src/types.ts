@@ -43,6 +43,7 @@ export interface SecFormData {
   principalAddress: string;
   execCity: string;
   execDate: string;
+  execYear?: string;
 
   // 2. Capital Stock Details
   parValue: number;

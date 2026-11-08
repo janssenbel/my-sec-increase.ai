@@ -113,8 +113,11 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
 
-  // Series Year
-  const execYear = new Date().getFullYear();
+  // Series / Execution Year
+  const execYear =
+    data.execYear !== undefined && String(data.execYear).trim() !== ''
+      ? String(data.execYear).trim()
+      : String(new Date().getFullYear());
 
   const shMeetingDateStr = data.shMeetingDate
     ? new Date(data.shMeetingDate).toLocaleDateString('en-US', {

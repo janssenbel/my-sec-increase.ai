@@ -6,6 +6,7 @@ export const initialFormData: SecFormData = {
   principalAddress: 'Unit 1802, One Ayala Tower, Ayala Avenue, Makati City, Metro Manila',
   execCity: '',
   execDate: '',
+  execYear: String(new Date().getFullYear()),
 
   parValue: 100.0,
   oldShares: 10000,
@@ -109,6 +110,7 @@ export function createBlankFormData(): SecFormData {
     principalAddress: '',
     execCity: '',
     execDate: '',
+    execYear: String(new Date().getFullYear()),
 
     parValue: 100.0,
     oldShares: 0,

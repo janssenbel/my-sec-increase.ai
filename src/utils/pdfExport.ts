@@ -227,7 +227,7 @@ function drawVenueBlock(doc: jsPDF, currentY: number, bracketChar: ')' | ']' = '
   return y + 7;
 }
 
-function drawNotaryBlock(doc: jsPDF, currentY: number, execYear: number): number {
+function drawNotaryBlock(doc: jsPDF, currentY: number, execYear: string | number): number {
   let y = ensureSpace(doc, currentY, 28);
   y += 4;
   doc.setFont('times', 'bold');
@@ -310,7 +310,10 @@ export function generateSeparatePdfs(data: SecFormData): GeneratedPdfDoc[] {
   const oldAcs = oldShares * par;
   const newAcs = newShares * par;
   const increase = newAcs - oldAcs;
-  const execYear = new Date().getFullYear();
+  const execYear =
+    data.execYear !== undefined && String(data.execYear).trim() !== ''
+      ? String(data.execYear).trim()
+      : String(new Date().getFullYear());
 
   const shMeetingDateStr = data.shMeetingDate
     ? new Date(data.shMeetingDate).toLocaleDateString('en-US', {
