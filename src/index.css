@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -17,6 +19,35 @@
     word-wrap: break-word;
     word-break: break-word;
     vertical-align: middle;
+  }
+}
+
+/* Dark mode form inputs & controls (strictly screen-only and outside A4 document paper) */
+@media screen {
+  html.dark {
+    color-scheme: dark;
+  }
+
+  html.dark label {
+    color: #cbd5e1;
+  }
+
+  html.dark input:not([type="checkbox"]),
+  html.dark select,
+  html.dark textarea {
+    background-color: #0f172a;
+    color: #f8fafc;
+    border-color: #334155;
+  }
+
+  html.dark input:not([type="checkbox"])::placeholder,
+  html.dark textarea::placeholder {
+    color: #64748b;
+  }
+
+  html.dark input[readonly] {
+    background-color: #1e293b;
+    color: #cbd5e1;
   }
 }
 

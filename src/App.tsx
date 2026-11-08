@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FileText,
   Printer,
@@ -17,6 +17,8 @@ import {
   Layers,
   Maximize2,
   Minimize2,
+  Moon,
+  Sun,
 } from 'lucide-react';
 import { SecFormData, CurrentStockholder, Director, Subscriber } from './types';
 import { initialFormData } from './utils/initialData';
@@ -28,6 +30,28 @@ export default function App() {
   const [formData, setFormData] = useState<SecFormData>(initialFormData);
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
   const [fitMobileScreen, setFitMobileScreen] = useState<boolean>(true);
+  const [darkMode, setDarkMode] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return false;
+    const saved = window.localStorage.getItem('sec-theme');
+    if (saved === 'dark' || saved === 'light') return saved === 'dark';
+    return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false;
+  });
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (darkMode) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    try {
+      window.localStorage.setItem('sec-theme', darkMode ? 'dark' : 'light');
+    } catch {
+      // ignore storage errors
+    }
+  }, [darkMode]);
+
+  const appIconUrl = `${import.meta.env.BASE_URL}apple-touch-icon.png`;
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -250,14 +274,16 @@ export default function App() {
   const allCash = formData.subscribers.length > 0 && formData.subscribers.every(s => s.modeOfPayment === 'Cash');
 
   return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 flex flex-col font-sans print:bg-white print:block print:min-h-0">
+    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:min-h-0">
       {/* Top Application Header (Compact on iPhone to respect 15% sticky height cap) */}
       <header className="bg-slate-900/95 backdrop-blur-md text-white border-b border-slate-800 sticky top-0 z-50 shadow-md print:hidden no-print">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="p-2 bg-blue-600 rounded-xl text-white shrink-0">
-              <Building2 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </div>
+            <img
+              src={appIconUrl}
+              alt="SEC Capital Increase Icon"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-sm shrink-0 border border-white/10"
+            />
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight truncate">
                 SEC Capital Increase Generator
@@ -268,7 +294,22 @@ export default function App() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Dark Mode Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setDarkMode(prev => !prev)}
+              aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              className="min-h-[38px] min-w-[38px] p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700 flex items-center justify-center transition-colors"
+            >
+              {darkMode ? (
+                <Sun className="w-4 h-4 text-amber-400" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-300" />
+              )}
+            </button>
+
             {/* View Mode Toggle */}
             <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
               <button
@@ -330,14 +371,14 @@ export default function App() {
       {/* Main Content Area (Extra bottom padding on mobile so thumb bar never overlaps content) */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 pt-3 pb-24 sm:px-4 md:p-6 md:pb-10 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
         {/* Compliance & Summary Banner */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
             <div className="flex items-start sm:items-center gap-3">
               <div
                 className={`p-2 sm:p-2.5 rounded-xl shrink-0 ${
                   isSubCompliant && isPaidCompliant
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                    : 'bg-amber-50 text-amber-700 border border-amber-200'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60'
+                    : 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-800/60'
                 }`}
               >
                 {isSubCompliant && isPaidCompliant ? (
@@ -348,32 +389,32 @@ export default function App() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900">
+                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
                     SEC 25%-25% Statutory Capital Rule
                   </h3>
                   <span
                     className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
                       isSubCompliant && isPaidCompliant
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : 'bg-amber-100 text-amber-800'
+                        ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300'
+                        : 'bg-amber-100 dark:bg-amber-900/60 text-amber-800 dark:text-amber-300'
                     }`}
                   >
                     {isSubCompliant && isPaidCompliant ? 'Compliant' : 'Review Required'}
                   </span>
                 </div>
-                <div className="text-xs text-slate-600 mt-1.5 grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1">
+                <div className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1">
                   <span>
-                    Increase: <b className="text-slate-900">Php {fmtNum(increase)}</b>
+                    Increase: <b className="text-slate-900 dark:text-slate-100">Php {fmtNum(increase)}</b>
                   </span>
                   <span>
                     25% Subscribed:&nbsp;
-                    <span className={isSubCompliant ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'}>
+                    <span className={isSubCompliant ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-amber-700 dark:text-amber-400 font-semibold'}>
                       Php {fmtNum(reqSubscribed25)} (Actual: Php {fmtNum(totalSubscribed)})
                     </span>
                   </span>
                   <span>
                     25% Paid-Up:&nbsp;
-                    <span className={isPaidCompliant ? 'text-emerald-700 font-semibold' : 'text-amber-700 font-semibold'}>
+                    <span className={isPaidCompliant ? 'text-emerald-700 dark:text-emerald-400 font-semibold' : 'text-amber-700 dark:text-amber-400 font-semibold'}>
                       Php {fmtNum(reqPaid25)} (Actual: Php {fmtNum(totalPaid)})
                     </span>
                   </span>
@@ -382,21 +423,21 @@ export default function App() {
             </div>
 
             {/* Documents Generated Info */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100">
-              <span className="text-slate-500 font-medium">Auto-Generated:</span>
-              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-200 font-medium">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100 dark:border-slate-800">
+              <span className="text-slate-500 dark:text-slate-400 font-medium">Auto-Generated:</span>
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700 font-medium">
                 Unified Cert
               </span>
-              <span className="px-2 py-1 bg-slate-100 text-slate-700 rounded-md border border-slate-200 font-medium">
+              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700 font-medium">
                 Treasurer&rsquo;s Affidavit
               </span>
               {cashSubCount > 0 && (
-                <span className="px-2 py-1 bg-blue-50 text-blue-700 rounded-md border border-blue-200 font-medium">
+                <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 rounded-md border border-blue-200 dark:border-blue-800/60 font-medium">
                   {cashSubCount} Cash Contract{cashSubCount > 1 ? 's' : ''}
                 </span>
               )}
               {convSubCount > 0 && (
-                <span className="px-2 py-1 bg-purple-50 text-purple-700 rounded-md border border-purple-200 font-medium">
+                <span className="px-2 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 rounded-md border border-purple-200 dark:border-purple-800/60 font-medium">
                   {convSubCount} Deed{convSubCount > 1 ? 's' : ''} of Assignment
                 </span>
               )}
@@ -424,7 +465,7 @@ export default function App() {
                     key={item.id}
                     type="button"
                     onClick={() => scrollToSection(item.id)}
-                    className="px-3 py-2 min-h-[38px] bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 active:bg-blue-50 active:border-blue-300 active:text-blue-700 shadow-2xs shrink-0"
+                    className="px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 active:bg-blue-50 dark:active:bg-blue-950 active:border-blue-300 active:text-blue-700 shadow-2xs shrink-0"
                   >
                     {item.label}
                   </button>
@@ -435,17 +476,17 @@ export default function App() {
             {/* 1. Corporate Details Card */}
             <section
               id="sec-1-corp"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
-                <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
-                  <Building2 className="w-5 h-5 text-blue-600 shrink-0" />
+              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
+                  <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                   <span>1. Corporate Information &amp; Venue</span>
                 </div>
                 <button
                   type="button"
                   onClick={handleResetSample}
-                  className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 hover:text-slate-800 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors shrink-0"
+                  className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Reset</span>
@@ -522,16 +563,16 @@ export default function App() {
             {/* 2. Capital Stock Details Card */}
             <section
               id="sec-2-acs"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 pb-3">
-                <Coins className="w-5 h-5 text-blue-600 shrink-0" />
+              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <Coins className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span>2. Authorized Capital Stock (ACS) Structure</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Par Value per Share (Php)
                   </label>
                   <input
@@ -544,7 +585,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Previous Authorized Shares
                   </label>
                   <input
@@ -553,22 +594,22 @@ export default function App() {
                     onChange={e => updateField('oldShares', parseFloat(e.target.value) || 0)}
                     className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <span className="text-[11px] text-slate-500 mt-0.5 block">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">
                     Previous ACS: Php {fmtNum(oldAcs)}
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     New Authorized Shares
                   </label>
                   <input
                     type="number"
                     value={formData.newShares}
                     onChange={e => updateField('newShares', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700 dark:text-blue-400"
                   />
-                  <span className="text-[11px] text-slate-500 mt-0.5 block">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">
                     New ACS: Php {fmtNum(newAcs)}
                   </span>
                 </div>
@@ -578,22 +619,22 @@ export default function App() {
             {/* 3. Present Capital Stock (Item 3 Table) */}
             <section
               id="sec-3-stock"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 pb-3">
+              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
-                    <Layers className="w-5 h-5 text-blue-600 shrink-0" />
+                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
+                    <Layers className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                     <span>3. Present Capital Stock (Item 3 Table)</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     Current shareholdings as of the stockholders&rsquo; meeting approving the increase.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={addCurrentStockholder}
-                  className="hidden sm:flex items-center gap-1 px-3 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-semibold rounded-xl border border-blue-200 transition-colors shrink-0"
+                  className="hidden sm:flex items-center gap-1 px-3 py-2 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Stockholder
@@ -605,16 +646,16 @@ export default function App() {
                 {formData.currentStockholders.map((s, idx) => (
                   <div
                     key={s.id}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-3"
+                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 space-y-3"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                         Stockholder #{idx + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeCurrentStockholder(s.id)}
-                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg transition-colors"
                         title="Remove Stockholder"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -704,7 +745,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addCurrentStockholder}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition-colors"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 dark:bg-blue-950/60 active:bg-blue-100 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Current Stockholder
@@ -713,8 +754,8 @@ export default function App() {
 
               {/* Desktop Table for Current Stockholders (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
-                  <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
+                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
                     <tr>
                       <th className="p-2.5">Name and Nationality</th>
                       <th className="p-2.5 w-28 text-center">Class of Shares</th>
@@ -724,9 +765,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     {formData.currentStockholders.map(s => (
-                      <tr key={s.id} className="hover:bg-slate-50">
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="p-2">
                           <input
                             type="text"
@@ -803,9 +844,9 @@ export default function App() {
               </div>
 
               {/* Treasury Shares Option */}
-              <div className="mt-4 p-3.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mt-4 p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                     Treasury Shares (No. of Shares, if any)
                   </label>
                   <input
@@ -818,7 +859,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                     Treasury Shares Subscribed (Php)
                   </label>
                   <input
@@ -832,7 +873,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                     Treasury Shares Paid-up (Php)
                   </label>
                   <input
@@ -851,16 +892,16 @@ export default function App() {
             {/* 4. Meetings & Statutory Compliance Checkboxes */}
             <section
               id="sec-4-meetings"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 font-semibold text-base mb-4 border-b border-slate-100 pb-3">
-                <Calendar className="w-5 h-5 text-blue-600" />
-                <span>4. Meetings & Item 6 Statutory Compliance Boxes</span>
+              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <span>4. Meetings &amp; Item 6 Statutory Compliance Boxes</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Stockholders&rsquo; Meeting Date
                   </label>
                   <input
@@ -872,7 +913,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Board of Directors Meeting Date
                   </label>
                   <input
@@ -884,7 +925,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Meeting Format
                   </label>
                   <select
@@ -900,7 +941,7 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Amended Article Provision(s)
                   </label>
                   <input
@@ -913,48 +954,48 @@ export default function App() {
               </div>
 
               {/* Item 6 Statutory Compliance Checkboxes */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="font-semibold text-sm text-slate-800">
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">
                     6. That the requirements of:
                   </span>
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
                     (Click to mark/unmark boxes; marked boxes will display with &lsquo;✓&rsquo; in the stacked box table)
                   </span>
                 </div>
                 <div className="space-y-2 text-xs">
-                  <label className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50/50 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec37}
                       onChange={e => updateField('chkSec37', e.target.checked)}
                       className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-slate-800 dark:text-slate-200">
                       Section 37 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
 
-                  <label className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50/50 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec38}
                       onChange={e => updateField('chkSec38', e.target.checked)}
                       className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-slate-800 dark:text-slate-200">
                       Section 38 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
 
-                  <label className="flex items-center gap-3 p-2.5 bg-white border border-slate-200 rounded-lg cursor-pointer hover:bg-blue-50/50 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec42}
                       onChange={e => updateField('chkSec42', e.target.checked)}
                       className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
                     />
-                    <span className="font-medium text-slate-800">
+                    <span className="font-medium text-slate-800 dark:text-slate-200">
                       Section 42 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
@@ -965,10 +1006,10 @@ export default function App() {
             {/* 5. Officers & Directors Card */}
             <section
               id="sec-5-officers"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 pb-3">
-                <Users className="w-5 h-5 text-blue-600 shrink-0" />
+              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                 <span>5. Officers, Meeting Chairs &amp; Board of Directors</span>
               </div>
 
@@ -1066,13 +1107,13 @@ export default function App() {
 
               {/* Directors Header */}
               <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-xs sm:text-sm text-slate-800">
+                <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
                   Board of Directors (Signatories on Dedicated Following Page)
                 </span>
                 <button
                   type="button"
                   onClick={addDirector}
-                  className="hidden sm:flex items-center gap-1 text-xs text-blue-700 hover:text-blue-900 font-semibold px-2.5 py-1.5 bg-blue-50 rounded-lg border border-blue-200"
+                  className="hidden sm:flex items-center gap-1 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-900 font-semibold px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 rounded-lg border border-blue-200 dark:border-blue-800"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Director
@@ -1084,16 +1125,16 @@ export default function App() {
                 {formData.directors.map((d, idx) => (
                   <div
                     key={d.id}
-                    className="p-3.5 rounded-xl border border-slate-200 bg-slate-50/70 space-y-2.5"
+                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 space-y-2.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-700 bg-white px-2.5 py-1 rounded-md border border-slate-200">
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">
                         Director #{idx + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeDirector(d.id)}
-                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg transition-colors"
                         title="Remove Director"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1101,7 +1142,7 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                         Director Full Name
                       </label>
                       <input
@@ -1115,7 +1156,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           TIN (Auto-fills Evidence of ID)
                         </label>
                         <input
@@ -1127,7 +1168,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Competent Evidence of Identity
                         </label>
                         <input
@@ -1145,7 +1186,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addDirector}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 active:bg-blue-100 text-blue-700 text-xs font-bold rounded-xl border border-blue-200 transition-colors"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 dark:bg-blue-950/60 active:bg-blue-100 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Director
@@ -1154,8 +1195,8 @@ export default function App() {
 
               {/* Desktop Table for Board of Directors (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
-                  <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
+                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
                     <tr>
                       <th className="p-2.5">Director Name</th>
                       <th className="p-2.5 w-48">TIN</th>
@@ -1163,9 +1204,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     {formData.directors.map(d => (
-                      <tr key={d.id} className="hover:bg-slate-50">
+                      <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="p-2">
                           <input
                             type="text"
@@ -1212,18 +1253,18 @@ export default function App() {
             {/* 6. Subscriptions to the Increase Card */}
             <section
               id="sec-6-subs"
-              className="scroll-mt-16 bg-white rounded-2xl border border-slate-200 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-slate-100 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 font-semibold text-sm sm:text-base">
-                    <FileText className="w-5 h-5 text-blue-600 shrink-0" />
+                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
+                    <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                     <span>6. Subscriptions to the Increase &amp; Document Routing</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                     Select payment mode: <b>Cash</b> generates a Subscription Contract. <b>Conversion</b> generates a Deed of Assignment.
                     {allCash && (
-                      <span className="block text-emerald-700 font-medium mt-0.5">
+                      <span className="block text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
                         &bull; All subscribers are paying in Cash: The &ldquo;Mode of Payment&rdquo; column is automatically removed from the Unified Certification.
                       </span>
                     )}
@@ -1244,20 +1285,20 @@ export default function App() {
                 {formData.subscribers.map((s, idx) => (
                   <div
                     key={s.id}
-                    className="p-4 rounded-2xl border border-slate-200 bg-slate-50/70 space-y-3.5 shadow-2xs"
+                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 space-y-3.5 shadow-2xs"
                   >
-                    <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 pb-2.5">
+                    <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-700 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800 bg-white px-2.5 py-1 rounded-lg border border-slate-200">
+                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
                           Subscriber #{idx + 1}
                         </span>
                         <span
                           className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
                             s.modeOfPayment === 'Cash'
-                              ? 'bg-blue-50 text-blue-700 border-blue-200'
+                              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
                               : s.modeOfPayment === 'Conversion'
-                                ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                : 'bg-indigo-50 text-indigo-800 border-indigo-200'
+                                ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
+                                : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
                           }`}
                         >
                           {s.modeOfPayment === 'Both' ? 'Cash + Conversion' : s.modeOfPayment}
@@ -1266,7 +1307,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => removeSubscriber(s.id)}
-                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="min-h-[40px] min-w-[40px] flex items-center justify-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/50 rounded-lg transition-colors"
                         title="Remove Subscriber"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1275,7 +1316,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Subscriber Full Name
                         </label>
                         <input
@@ -1287,7 +1328,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Nationality
                         </label>
                         <input
@@ -1300,7 +1341,7 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                         Residential Address
                       </label>
                       <input
@@ -1316,7 +1357,7 @@ export default function App() {
 
                     {/* Payment Mode Selector */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
                         Mode of Payment &amp; Document Routing
                       </label>
                       <select
@@ -1343,7 +1384,7 @@ export default function App() {
                     {/* Shares, Price & Paid Grid */}
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Total Shares
                         </label>
                         <input
@@ -1363,7 +1404,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Price / Share
                         </label>
                         <input
@@ -1379,7 +1420,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Total Paid
                         </label>
                         <input
@@ -1403,8 +1444,8 @@ export default function App() {
 
                     {/* Conversion Description on Mobile */}
                     {s.modeOfPayment === 'Conversion' && (
-                      <div className="p-3 bg-purple-50/90 border border-purple-200 rounded-xl">
-                        <label className="block text-xs font-semibold text-purple-900 mb-1">
+                      <div className="p-3 bg-purple-50/90 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl">
+                        <label className="block text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
                           In the form of (Deed of Assignment):
                         </label>
                         <input
@@ -1423,14 +1464,14 @@ export default function App() {
 
                     {/* Both Cash & Conversion Breakdown on Mobile */}
                     {s.modeOfPayment === 'Both' && (
-                      <div className="p-3 bg-indigo-50/80 border border-indigo-200 rounded-xl space-y-3">
-                        <div className="p-2.5 bg-white border border-blue-200 rounded-lg">
-                          <div className="text-xs font-bold text-blue-800 mb-2">
+                      <div className="p-3 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-xl space-y-3">
+                        <div className="p-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-lg">
+                          <div className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
                             1. Cash Portion (Subscription Contract)
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                                 Cash Shares
                               </label>
                               <input
@@ -1445,7 +1486,7 @@ export default function App() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                                 Cash Paid (Php)
                               </label>
                               <input
@@ -1463,13 +1504,13 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="p-2.5 bg-white border border-purple-200 rounded-lg">
-                          <div className="text-xs font-bold text-purple-800 mb-2">
+                        <div className="p-2.5 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 rounded-lg">
+                          <div className="text-xs font-bold text-purple-800 dark:text-purple-300 mb-2">
                             2. Conversion Portion (Deed of Assignment)
                           </div>
                           <div className="grid grid-cols-2 gap-2 mb-2.5">
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                                 Conv. Shares
                               </label>
                               <input
@@ -1484,7 +1525,7 @@ export default function App() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                                 Conv. Paid (Php)
                               </label>
                               <input
@@ -1500,7 +1541,7 @@ export default function App() {
                               />
                             </div>
                           </div>
-                          <label className="block text-[11px] font-semibold text-purple-900 mb-1">
+                          <label className="block text-[11px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
                             In the form of (Deed of Assignment):
                           </label>
                           <input
@@ -1521,7 +1562,7 @@ export default function App() {
                     {/* TIN & Competent Evidence of Identity */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           TIN (Auto-used as Evidence of ID)
                         </label>
                         <input
@@ -1533,7 +1574,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
                           Competent Evidence of Identity
                         </label>
                         <input
@@ -1560,8 +1601,8 @@ export default function App() {
 
               {/* Desktop Table for Subscribers (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 rounded-lg">
-                  <thead className="bg-slate-50 text-slate-700 font-semibold border-b border-slate-200">
+                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
+                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
                     <tr>
                       <th className="p-2.5">Subscriber Name</th>
                       <th className="p-2.5 w-24">Nationality</th>
@@ -1574,9 +1615,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200">
+                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                     {formData.subscribers.map(s => (
-                      <tr key={s.id} className="hover:bg-slate-50">
+                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
                         <td className="p-2 align-top">
                           <input
                             type="text"
@@ -1681,8 +1722,8 @@ export default function App() {
                           </select>
 
                           {s.modeOfPayment === 'Conversion' && (
-                            <div className="mt-2 p-2 bg-purple-50/80 border border-purple-200 rounded-md text-left">
-                              <label className="block text-[11px] font-semibold text-purple-900 mb-1">
+                            <div className="mt-2 p-2 bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-md text-left">
+                              <label className="block text-[11px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
                                 In the form of (Deed of Assignment):
                               </label>
                               <input
@@ -1700,15 +1741,15 @@ export default function App() {
                           )}
 
                           {s.modeOfPayment === 'Both' && (
-                            <div className="mt-2 p-2.5 bg-indigo-50/70 border border-indigo-200 rounded-md text-left space-y-2.5">
+                            <div className="mt-2 p-2.5 bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-md text-left space-y-2.5">
                               {/* Cash Portion */}
-                              <div className="p-2 bg-white border border-blue-200 rounded">
-                                <div className="text-[11px] font-bold text-blue-800 mb-1.5">
+                              <div className="p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded">
+                                <div className="text-[11px] font-bold text-blue-800 dark:text-blue-300 mb-1.5">
                                   1. Cash Portion (Subscription Contract)
                                 </div>
                                 <div className="grid grid-cols-2 gap-1.5">
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                                       Cash Shares
                                     </label>
                                     <input
@@ -1723,7 +1764,7 @@ export default function App() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                                       Cash Paid (Php)
                                     </label>
                                     <input
@@ -1742,13 +1783,13 @@ export default function App() {
                               </div>
 
                               {/* Conversion Portion */}
-                              <div className="p-2 bg-white border border-purple-200 rounded">
-                                <div className="text-[11px] font-bold text-purple-800 mb-1.5">
+                              <div className="p-2 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 rounded">
+                                <div className="text-[11px] font-bold text-purple-800 dark:text-purple-300 mb-1.5">
                                   2. Conversion Portion (Deed of Assignment)
                                 </div>
                                 <div className="grid grid-cols-2 gap-1.5 mb-2">
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                                       Conv. Shares
                                     </label>
                                     <input
@@ -1763,7 +1804,7 @@ export default function App() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
                                       Conv. Paid (Php)
                                     </label>
                                     <input
@@ -1779,7 +1820,7 @@ export default function App() {
                                     />
                                   </div>
                                 </div>
-                                <label className="block text-[10px] font-semibold text-purple-900 mb-1">
+                                <label className="block text-[10px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
                                   In the form of (Deed of Assignment):
                                 </label>
                                 <input
@@ -1950,7 +1991,7 @@ export default function App() {
       </main>
 
       {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
         <div className="grid grid-cols-3 gap-2 max-w-lg mx-auto">
           <button
             type="button"
@@ -1980,7 +2021,7 @@ export default function App() {
               setViewMode('preview');
               setTimeout(() => window.print(), 50);
             }}
-            className="min-h-[44px] px-2.5 py-2 bg-slate-900 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+            className="min-h-[44px] px-2.5 py-2 bg-slate-900 dark:bg-slate-700 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1.5 shadow-xs"
           >
             <Printer className="w-4 h-4 shrink-0" />
             <span>Save PDF (A4)</span>

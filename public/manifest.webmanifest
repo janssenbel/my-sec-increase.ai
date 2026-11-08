@@ -1,0 +1,31 @@
+{
+  "id": "./",
+  "name": "SEC Capital Increase Document Generator",
+  "short_name": "SEC Increase",
+  "description": "Generate Philippine SEC Increase in Authorized Capital Stock documents including Unified Certification, Treasurer's Affidavit, Cash Subscription Contracts, and Debt Conversion Deeds of Assignment.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "pwa-maskable-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
