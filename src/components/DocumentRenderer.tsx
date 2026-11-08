@@ -36,7 +36,7 @@ const ScaledA4Page: React.FC<{ scale: number; children: React.ReactNode }> = ({
 
   return (
     <div
-      className="a4-scale-outer relative mx-auto print:!w-[210mm] print:!h-auto"
+      className="a4-scale-outer relative mx-auto print:!w-full print:!max-w-full print:!h-auto print:!min-h-0 print:!m-0 print:!p-0"
       style={
         isScaled
           ? {
@@ -56,7 +56,7 @@ const ScaledA4Page: React.FC<{ scale: number; children: React.ReactNode }> = ({
               }
             : undefined
         }
-        className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:m-0 print:border-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]"
+        className="a4-page bg-white text-black p-[20mm] shadow-lg print:shadow-none print:!p-0 print:!m-0 print:!border-none print:!w-full print:!max-w-full print:!min-h-0 print:!h-auto print:!transform-none w-[210mm] min-h-[297mm] relative box-border font-serif text-[10.5pt] leading-[1.35]"
       >
         {children}
       </div>
@@ -1255,7 +1255,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
           </p>
         </div>
 
-        <table className="w-[85%] border-collapse border border-black table-fixed text-[9pt] leading-[1.3]">
+        <table className="w-full border-collapse border border-black table-fixed text-[9pt] leading-[1.3]">
           <colgroup>
             <col style={{ width: '45%' }} />
             <col style={{ width: '55%' }} />
@@ -1400,7 +1400,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                 return (
                   <table
                     key={blkIdx}
-                    className="w-[85%] border-collapse border border-black my-2 table-fixed text-[9pt] leading-[1.3]"
+                    className="w-full border-collapse border border-black my-2 table-fixed text-[9pt] leading-[1.3]"
                   >
                     <colgroup>
                       <col style={{ width: '45%' }} />
@@ -1592,7 +1592,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                 stock:
               </p>
 
-              <table className="w-[85%] border-collapse border border-black my-4 mx-auto text-[10pt] table-fixed">
+              <table className="w-full border-collapse border border-black my-4 mx-auto text-[10pt] table-fixed">
                 <colgroup>
                   <col style={{ width: '45%' }} />
                   <col style={{ width: '55%' }} />
@@ -1705,7 +1705,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                     return true;
                   });
                   return (
-                    <table className="w-[85%] border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
+                    <table className="w-full border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
                       <colgroup>
                         <col style={{ width: '45%' }} />
                         <col style={{ width: '55%' }} />
@@ -1923,7 +1923,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                     return true;
                   });
                   return (
-                    <table className="w-[85%] border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
+                    <table className="w-full border-collapse border border-black my-3 table-fixed text-[9pt] leading-[1.3]">
                       <colgroup>
                         <col style={{ width: '45%' }} />
                         <col style={{ width: '55%' }} />

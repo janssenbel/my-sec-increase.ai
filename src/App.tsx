@@ -588,10 +588,8 @@ export default function App() {
               onClick={() => {
                 if (viewMode !== 'preview') {
                   setViewMode('preview');
-                  setTimeout(() => window.print(), 80);
-                } else {
-                  window.print();
                 }
+                window.print();
               }}
               className="hidden md:flex items-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
             >
@@ -2231,7 +2229,7 @@ export default function App() {
                 type="button"
                 onClick={() => {
                   setViewMode('preview');
-                  setTimeout(() => window.print(), 50);
+                  window.print();
                 }}
                 className="px-6 py-3 bg-slate-800 hover:bg-slate-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >

@@ -478,7 +478,7 @@ export function exportToWordA4(data: SecFormData): void {
       <p style="text-align: justify;">
         SUBSCRIBED AND SWORN to before me this _____ day of _______________ ${execYear} in ____________________, affiants exhibited to me their Competent Evidence of Identity:
       </p>
-      <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
+      <table class="doc-table" style="width: 100%; margin: 10pt 0; page-break-inside: auto;">
         <tbody>
           <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
             <td style="border: 1pt solid black; padding: 3pt 5pt; width: 45%;">Name</td>
@@ -588,7 +588,7 @@ export function exportToWordA4(data: SecFormData): void {
       <p style="text-indent: 36pt; text-align: justify;">
         1. The Corporation has agreed to issue to the Subscriber the following shares of stock from the increase of authorized capital stock:
       </p>
-      <table class="doc-table" style="width: 80%; margin: 12pt auto;">
+      <table class="doc-table" style="width: 100%; margin: 12pt 0;">
         <tbody>
           <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
             <td style="border: 1pt solid black; padding: 4pt 6pt; text-align: center; width: 50%;">NUMBER OF SHARES</td>
@@ -645,7 +645,7 @@ export function exportToWordA4(data: SecFormData): void {
         <p style="text-indent: 36pt; text-align: justify;">
           BEFORE ME, a Notary Public in and for ____________________, Philippines, this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
         </p>
-        <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
+        <table class="doc-table" style="width: 100%; margin: 10pt 0; page-break-inside: auto;">
           <tbody>
             <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
               <td style="border: 1pt solid black; padding: 3pt 5pt; width: 45%;">Name</td>
@@ -786,7 +786,7 @@ export function exportToWordA4(data: SecFormData): void {
         <p style="text-indent: 36pt; text-align: justify;">
           BEFORE ME, a Notary Public for and in the above-named jurisdiction on this _____ day of _______________ ${execYear}, personally appeared the following persons with their respective Competent Evidence of Identity:
         </p>
-        <table class="doc-table" style="width: 85%; margin: 10pt 0; page-break-inside: auto;">
+        <table class="doc-table" style="width: 100%; margin: 10pt 0; page-break-inside: auto;">
           <tbody>
             <tr style="background-color: #f2f2f2; page-break-inside: avoid; font-weight: bold;">
               <td style="border: 1pt solid black; padding: 3pt 5pt; width: 45%;">Name</td>

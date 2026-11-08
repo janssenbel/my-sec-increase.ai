@@ -62,38 +62,48 @@
 
 @page {
   size: A4 portrait;
-  margin: 0mm;
+  margin: 18mm 20mm 18mm 20mm;
 }
 
 @media print {
   @page {
     size: A4 portrait;
-    margin: 0mm !important;
+    margin: 18mm 20mm 18mm 20mm !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box !important;
   }
 
   html,
   body {
-    width: 210mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
     background: #ffffff !important;
     color: #000000 !important;
     overflow: visible !important;
     height: auto !important;
+    min-height: 0 !important;
     position: static !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
 
   #root,
+  #root > div,
   main {
     overflow: visible !important;
     height: auto !important;
+    min-height: 0 !important;
     position: static !important;
     margin: 0 !important;
     padding: 0 !important;
     display: block !important;
-    max-width: none !important;
+    max-width: 100% !important;
     width: 100% !important;
   }
 
@@ -111,9 +121,13 @@
   }
 
   table {
-    page-break-inside: auto !important;
-    break-inside: auto !important;
     border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  /* Keep checkbox table indented as inline checklist */
+  table.border-collapse.ml-6 {
+    width: auto !important;
   }
 
   tr {
@@ -133,7 +147,8 @@
 
   .a4-scale-outer,
   .a4-scale-outer[style] {
-    width: 210mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
     height: auto !important;
     min-height: 0 !important;
     margin: 0 !important;
@@ -141,27 +156,35 @@
     overflow: visible !important;
     display: block !important;
     transform: none !important;
+    page-break-after: always !important;
+    break-after: page !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .a4-scale-outer:last-child,
+  .a4-scale-outer:last-of-type {
+    page-break-after: auto !important;
+    break-after: auto !important;
   }
 
   .a4-page,
   .a4-page[style] {
-    width: 210mm !important;
-    min-height: 297mm !important;
-    padding: 20mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0 !important;
     margin: 0 !important;
     box-shadow: none !important;
     border: none !important;
     background: #ffffff !important;
-    page-break-after: always !important;
-    break-after: page !important;
+    page-break-after: auto !important;
+    break-after: auto !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
     box-sizing: border-box !important;
     position: relative !important;
     transform: none !important;
-  }
-
-  .a4-page:last-child,
-  .a4-scale-outer:last-child .a4-page {
-    page-break-after: auto !important;
-    break-after: auto !important;
   }
 }
