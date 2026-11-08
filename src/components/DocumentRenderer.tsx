@@ -1786,7 +1786,7 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                 <b>{data.corpName.toUpperCase()}</b>, a corporation duly organized and existing by
                 virtue of the laws of the Republic of the Philippines, with principal office address
                 at {data.principalAddress}, represented herein by its President, <b>{presName}</b>,
-                hereinafter referred to as the &ldquo;<b>ASSIGNEE</b>&rdquo;.
+                and Treasurer, <b>{treasName}</b>, hereinafter referred to as the &ldquo;<b>ASSIGNEE</b>&rdquo;.
               </p>
 
               <p className="text-center font-bold my-3">- Witnesseth that -</p>
@@ -1861,7 +1861,15 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                       <br />
                       <br />
                       <div className="w-[85%] mx-auto border-b border-black mb-1"></div>
-                      <b>{presName}</b>, President
+                      <b>{presName}</b>
+                      <br />
+                      President
+                      <br />
+                      <br />
+                      <div className="w-[85%] mx-auto border-b border-black mb-1"></div>
+                      <b>{treasName}</b>
+                      <br />
+                      Treasurer
                     </td>
                   </tr>
                 </tbody>
@@ -1901,6 +1909,10 @@ export const DocumentRenderer: React.FC<DocumentRendererProps> = ({
                     {
                       name: presName,
                       evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                    },
+                    {
+                      name: treasName,
+                      evidence: getCompetentEvidence(data.treasTIN, undefined, data.treasName),
                     },
                   ];
                   const seen = new Set<string>();

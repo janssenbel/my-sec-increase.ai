@@ -139,7 +139,11 @@ export const AmendedAoiGenerator: React.FC<AmendedAoiGeneratorProps> = ({
         setGenerationStep('Finalizing SEC-compliant Amended Articles of Incorporation...');
       }, 7000);
 
-      const response = await fetch('/api/generate-amended-aoi', {
+      const baseUrl = import.meta.env.BASE_URL || '/';
+      const cleanBase = baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+      const apiUrl = `${cleanBase}api/generate-amended-aoi`;
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -150,7 +154,17 @@ export const AmendedAoiGenerator: React.FC<AmendedAoiGeneratorProps> = ({
       clearTimeout(timer1);
       clearTimeout(timer2);
 
-      const data = await response.json();
+      const rawResponseText = await response.text();
+      let data: any;
+      try {
+        data = JSON.parse(rawResponseText);
+      } catch {
+        throw new Error(
+          response.ok
+            ? 'Invalid response format from server.'
+            : `Server returned error (${response.status}): ${rawResponseText.slice(0, 200)}`
+        );
+      }
 
       if (!response.ok || !data.success) {
         throw new Error(data.error || 'Server error while generating Amended Articles of Incorporation.');
@@ -657,11 +671,17 @@ export const AmendedAoiGenerator: React.FC<AmendedAoiGeneratorProps> = ({
                     }
 
                     // Check if paragraph is the amended Capital Stock Article
+                    const targetName = (currentAoi.amendedArticleName || 'SEVENTH')
+                      .replace(/[^a-zA-Z0-9]/g, ' ')
+                      .trim()
+                      .toLowerCase();
+                    const trimmedLower = trimmed.toLowerCase();
                     const isAmendedArticle =
-                      new RegExp(`^####\\s*(${currentAoi.amendedArticleName}|ARTICLE\\s+${currentAoi.amendedArticleName})`, 'i').test(trimmed) ||
-                      new RegExp(`^(${currentAoi.amendedArticleName}|ARTICLE\\s+${currentAoi.amendedArticleName}):`, 'i').test(trimmed) ||
-                      trimmed.toLowerCase().includes('authorized capital stock of the corporation is') ||
-                      trimmed.toLowerCase().includes('as amended by the majority vote of the board of directors');
+                      (targetName.length > 0 && trimmedLower.includes(targetName)) ||
+                      trimmedLower.includes('seventh') ||
+                      trimmedLower.includes('authorized capital stock of the corporation is') ||
+                      (trimmedLower.includes('authorized capital stock') && trimmedLower.includes('pesos')) ||
+                      trimmedLower.includes('as amended by the majority vote of the board of directors');
 
                     if (trimmed.startsWith('#### ') || /^(ARTICLE|FIRST|SECOND|THIRD|FOURTH|FIFTH|SIXTH|SEVENTH|EIGHTH|NINTH|TENTH):/i.test(trimmed)) {
                       return (

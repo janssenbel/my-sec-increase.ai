@@ -279,8 +279,14 @@ CRITICAL LEGAL & PHILIPPINE SEC DRAFTING RULES:
       },
     });
 
-    const responseText = response.text || '{}';
-    let parsedData;
+    let responseText = (response.text || '{}').trim();
+    if (responseText.startsWith('```json')) {
+      responseText = responseText.replace(/^```json\s*/i, '').replace(/\s*```$/i, '').trim();
+    } else if (responseText.startsWith('```')) {
+      responseText = responseText.replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
+    }
+
+    let parsedData: any;
     try {
       parsedData = JSON.parse(responseText);
     } catch {
@@ -300,6 +306,26 @@ CRITICAL LEGAL & PHILIPPINE SEC DRAFTING RULES:
         ],
         fullText: responseText,
       };
+    }
+
+    if (parsedData && typeof parsedData === 'object') {
+      if (typeof parsedData.amendedArticleName !== 'string' || !parsedData.amendedArticleName) {
+        parsedData.amendedArticleName = formData.amendedArticle || 'SEVENTH';
+      }
+      if (typeof parsedData.title !== 'string') {
+        parsedData.title = `AMENDED ARTICLES OF INCORPORATION OF ${formData.corpName.toUpperCase()}`;
+      }
+      if (typeof parsedData.corpName !== 'string') {
+        parsedData.corpName = formData.corpName;
+      }
+      if (!Array.isArray(parsedData.summaryOfChanges)) {
+        parsedData.summaryOfChanges = [
+          `Increased Authorized Capital Stock to Php ${fmtNum(newAcs)}`,
+        ];
+      }
+      if (typeof parsedData.fullText !== 'string') {
+        parsedData.fullText = responseText;
+      }
     }
 
     res.json({

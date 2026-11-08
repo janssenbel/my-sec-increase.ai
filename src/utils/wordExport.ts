@@ -722,7 +722,7 @@ export function exportToWordA4(data: SecFormData): void {
       </p>
       <p style="text-align: center;">- and -</p>
       <p style="text-indent: 36pt; text-align: justify;">
-        <b>${data.corpName.toUpperCase()}</b>, a corporation duly organized and existing under the laws of the Republic of the Philippines, with principal office address at ${data.principalAddress}, represented herein by its President, <b>${presName}</b>, hereinafter referred to as the &ldquo;<b>ASSIGNEE</b>&rdquo;.
+        <b>${data.corpName.toUpperCase()}</b>, a corporation duly organized and existing under the laws of the Republic of the Philippines, with principal office address at ${data.principalAddress}, represented herein by its President, <b>${presName}</b>, and Treasurer, <b>${treasName}</b>, hereinafter referred to as the &ldquo;<b>ASSIGNEE</b>&rdquo;.
       </p>
       <p style="text-align: center; font-weight: bold; margin: 12pt 0;">- Witnesseth that -</p>
       <p style="text-indent: 36pt; text-align: justify;">
@@ -760,7 +760,11 @@ export function exportToWordA4(data: SecFormData): void {
             <b>${data.corpName.toUpperCase()}</b><br /><br />
             By:<br /><br />
             _______________________________________<br />
-            <b>${presName}</b>, President
+            <b>${presName}</b><br />
+            President<br /><br />
+            _______________________________________<br />
+            <b>${treasName}</b><br />
+            Treasurer
           </td>
         </tr>
       </table>
@@ -797,6 +801,10 @@ export function exportToWordA4(data: SecFormData): void {
                 {
                   name: presName,
                   evidence: getCompetentEvidence(data.presTIN, undefined, data.presName),
+                },
+                {
+                  name: treasName,
+                  evidence: getCompetentEvidence(data.treasTIN, undefined, data.treasName),
                 },
               ];
               const seen = new Set<string>();
