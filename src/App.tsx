@@ -19,15 +19,73 @@ import {
   Minimize2,
   Moon,
   Sun,
+  Save,
+  FolderOpen,
+  BookmarkCheck,
+  Check,
+  FilePlus2,
 } from 'lucide-react';
-import { SecFormData, CurrentStockholder, Director, Subscriber } from './types';
-import { initialFormData } from './utils/initialData';
+import {
+  SecFormData,
+  CurrentStockholder,
+  Director,
+  Subscriber,
+  SavedCompanyProfile,
+} from './types';
+import { initialFormData, createBlankFormData } from './utils/initialData';
 import { fmtNum } from './utils/numberToWords';
 import { exportToWordA4 } from './utils/wordExport';
 import { DocumentRenderer } from './components/DocumentRenderer';
+import { CompanyProfileModal } from './components/CompanyProfileModal';
+
+const PROFILES_STORAGE_KEY = 'sec-company-profiles-v1';
+const ACTIVE_PROFILE_KEY = 'sec-active-profile-id-v1';
+const ACTIVE_DRAFT_KEY = 'sec-active-draft-v1';
 
 export default function App() {
-  const [formData, setFormData] = useState<SecFormData>(initialFormData);
+  const [formData, setFormData] = useState<SecFormData>(() => {
+    if (typeof window === 'undefined') return initialFormData;
+    try {
+      const savedDraft = window.localStorage.getItem(ACTIVE_DRAFT_KEY);
+      if (savedDraft) {
+        const parsed = JSON.parse(savedDraft);
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.subscribers)) {
+          return parsed as SecFormData;
+        }
+      }
+    } catch {
+      // ignore corrupted draft
+    }
+    return initialFormData;
+  });
+
+  const [savedProfiles, setSavedProfiles] = useState<SavedCompanyProfile[]>(() => {
+    if (typeof window === 'undefined') return [];
+    try {
+      const raw = window.localStorage.getItem(PROFILES_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return parsed;
+      }
+    } catch {
+      // ignore storage errors
+    }
+    return [];
+  });
+
+  const [activeProfileId, setActiveProfileId] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      return window.localStorage.getItem(ACTIVE_PROFILE_KEY) || null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
+  const [saveToast, setSaveToast] = useState<string | null>(null);
+  const [confirmResetSample, setConfirmResetSample] = useState<boolean>(false);
+
   const [viewMode, setViewMode] = useState<'form' | 'preview'>('form');
   const [fitMobileScreen, setFitMobileScreen] = useState<boolean>(true);
   const [darkMode, setDarkMode] = useState<boolean>(() => {
@@ -50,6 +108,160 @@ export default function App() {
       // ignore storage errors
     }
   }, [darkMode]);
+
+  // Persist current working draft automatically
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(ACTIVE_DRAFT_KEY, JSON.stringify(formData));
+    } catch {
+      // ignore storage errors
+    }
+  }, [formData]);
+
+  // Persist saved company profiles
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(PROFILES_STORAGE_KEY, JSON.stringify(savedProfiles));
+    } catch {
+      // ignore storage errors
+    }
+  }, [savedProfiles]);
+
+  // Persist active profile ID
+  useEffect(() => {
+    try {
+      if (activeProfileId) {
+        window.localStorage.setItem(ACTIVE_PROFILE_KEY, activeProfileId);
+      } else {
+        window.localStorage.removeItem(ACTIVE_PROFILE_KEY);
+      }
+    } catch {
+      // ignore storage errors
+    }
+  }, [activeProfileId]);
+
+  const triggerSaveToast = (msg: string) => {
+    setSaveToast(msg);
+    setTimeout(() => {
+      setSaveToast(prev => (prev === msg ? null : prev));
+    }, 3000);
+  };
+
+  const activeProfile = savedProfiles.find(p => p.id === activeProfileId) || null;
+
+  const handleSaveNewProfile = (customLabel?: string) => {
+    const now = new Date().toISOString();
+    const label =
+      (customLabel || '').trim() ||
+      (formData.corpName || '').trim() ||
+      'Untitled Corporation';
+    const newProfile: SavedCompanyProfile = {
+      id: `prof-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      profileName: label,
+      corpName: formData.corpName || label,
+      createdAt: now,
+      updatedAt: now,
+      data: JSON.parse(JSON.stringify(formData)) as SecFormData,
+    };
+    setSavedProfiles(prev => [newProfile, ...prev]);
+    setActiveProfileId(newProfile.id);
+    triggerSaveToast(`Saved "${label}"`);
+  };
+
+  const handleUpdateProfile = (id: string) => {
+    const now = new Date().toISOString();
+    const clonedData = JSON.parse(JSON.stringify(formData)) as SecFormData;
+    setSavedProfiles(prev =>
+      prev.map(p => {
+        if (p.id !== id) return p;
+        const nextCorpName = clonedData.corpName || p.corpName;
+        // If profileName was previously equal to the old corpName, keep it synced
+        const nextProfileName =
+          p.profileName === p.corpName && nextCorpName ? nextCorpName : p.profileName;
+        return {
+          ...p,
+          profileName: nextProfileName,
+          corpName: nextCorpName,
+          updatedAt: now,
+          data: clonedData,
+        };
+      }),
+    );
+    setActiveProfileId(id);
+    triggerSaveToast('Company profile saved!');
+  };
+
+  const handleQuickSaveProfile = () => {
+    if (activeProfile) {
+      handleUpdateProfile(activeProfile.id);
+    } else {
+      // Check if there is already a saved profile with the exact same corpName (case-insensitive)
+      const corpTrimmed = (formData.corpName || '').trim().toLowerCase();
+      const matchingExisting = corpTrimmed
+        ? savedProfiles.find(p => p.corpName.trim().toLowerCase() === corpTrimmed)
+        : undefined;
+      if (matchingExisting) {
+        handleUpdateProfile(matchingExisting.id);
+      } else {
+        handleSaveNewProfile();
+      }
+    }
+  };
+
+  const handleLoadProfile = (profile: SavedCompanyProfile) => {
+    const cloned = JSON.parse(JSON.stringify(profile.data)) as SecFormData;
+    setFormData(cloned);
+    setActiveProfileId(profile.id);
+    triggerSaveToast(`Loaded "${profile.profileName}"`);
+  };
+
+  const handleDeleteProfile = (id: string) => {
+    setSavedProfiles(prev => prev.filter(p => p.id !== id));
+    if (activeProfileId === id) {
+      setActiveProfileId(null);
+    }
+  };
+
+  const handleDuplicateProfile = (profile: SavedCompanyProfile) => {
+    const now = new Date().toISOString();
+    const copy: SavedCompanyProfile = {
+      ...profile,
+      id: `prof-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      profileName: `${profile.profileName} (Copy)`,
+      createdAt: now,
+      updatedAt: now,
+      data: JSON.parse(JSON.stringify(profile.data)) as SecFormData,
+    };
+    setSavedProfiles(prev => [copy, ...prev]);
+  };
+
+  const handleRenameProfile = (id: string, newName: string) => {
+    setSavedProfiles(prev =>
+      prev.map(p => (p.id === id ? { ...p, profileName: newName, updatedAt: new Date().toISOString() } : p)),
+    );
+  };
+
+  const handleImportProfiles = (imported: SavedCompanyProfile[]) => {
+    setSavedProfiles(prev => {
+      const existingMap = new Map(prev.map(p => [p.id, p]));
+      imported.forEach(item => {
+        existingMap.set(item.id, item);
+      });
+      return Array.from(existingMap.values()).sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+      );
+    });
+    if (imported.length === 1) {
+      setFormData(JSON.parse(JSON.stringify(imported[0].data)) as SecFormData);
+      setActiveProfileId(imported[0].id);
+    }
+  };
+
+  const handleStartNewBlankCompany = () => {
+    setFormData(createBlankFormData());
+    setActiveProfileId(null);
+    triggerSaveToast('Started new blank company');
+  };
 
   const appIconUrl = `${import.meta.env.BASE_URL}apple-touch-icon.png`;
 
@@ -266,9 +478,10 @@ export default function App() {
   };
 
   const handleResetSample = () => {
-    if (window.confirm('Reset all form fields to default sample data?')) {
-      setFormData(initialFormData);
-    }
+    setFormData(initialFormData);
+    setActiveProfileId(null);
+    setConfirmResetSample(false);
+    triggerSaveToast('Loaded sample template data');
   };
 
   const allCash = formData.subscribers.length > 0 && formData.subscribers.every(s => s.modeOfPayment === 'Cash');
@@ -295,6 +508,22 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+            {/* Saved Company Profiles Button in Header */}
+            <button
+              type="button"
+              onClick={() => setIsProfileModalOpen(true)}
+              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-100 border border-slate-700 flex items-center gap-1.5 text-xs font-semibold transition-colors"
+              title="Open Saved Company Profiles"
+            >
+              <FolderOpen className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <span className="hidden sm:inline">Profiles</span>
+              {savedProfiles.length > 0 && (
+                <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] font-bold rounded-full">
+                  {savedProfiles.length}
+                </span>
+              )}
+            </button>
+
             {/* Dark Mode Toggle Button */}
             <button
               type="button"
@@ -478,19 +707,142 @@ export default function App() {
               id="sec-1-corp"
               className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
                   <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
                   <span>1. Corporate Information &amp; Venue</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleResetSample}
-                  className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
-                >
-                  <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Reset</span>
-                </button>
+
+                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                  <button
+                    type="button"
+                    onClick={handleStartNewBlankCompany}
+                    className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
+                    title="Clear form to start a new blank corporation"
+                  >
+                    <FilePlus2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>New Blank</span>
+                  </button>
+
+                  {confirmResetSample ? (
+                    <div className="flex items-center gap-1 bg-amber-50 dark:bg-amber-950/60 border border-amber-200 dark:border-amber-800 px-2 py-1 rounded-lg">
+                      <span className="text-[11px] font-semibold text-amber-800 dark:text-amber-300">
+                        Load Sample?
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleResetSample}
+                        className="px-2 py-0.5 bg-amber-600 text-white rounded text-[11px] font-bold"
+                      >
+                        Yes
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmResetSample(false)}
+                        className="px-1.5 py-0.5 text-slate-600 dark:text-slate-300 text-[11px]"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmResetSample(true)}
+                      className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
+                      title="Load sample corporation data"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Sample</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Company Profile Save & Switch Bar */}
+              <div className="mb-5 p-3 sm:p-3.5 rounded-xl bg-blue-50/70 dark:bg-slate-800/70 border border-blue-200/80 dark:border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <BookmarkCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
+                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+                      Company Profile:
+                    </span>
+                    {activeProfile ? (
+                      <span className="text-xs font-bold text-blue-800 dark:text-blue-300 bg-blue-100/80 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800 px-2.5 py-0.5 rounded-md truncate">
+                        {activeProfile.profileName}
+                      </span>
+                    ) : (
+                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400 italic truncate">
+                        {formData.corpName || 'Unsaved Working Draft'}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Quick Switch Dropdown when profiles exist */}
+                  {savedProfiles.length > 0 && (
+                    <div className="flex items-center gap-1.5 sm:ml-2">
+                      <select
+                        aria-label="Quick switch saved company profile"
+                        value={activeProfileId || ''}
+                        onChange={e => {
+                          const selectedId = e.target.value;
+                          const found = savedProfiles.find(p => p.id === selectedId);
+                          if (found) {
+                            handleLoadProfile(found);
+                          }
+                        }}
+                        className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 max-w-[230px] truncate"
+                      >
+                        <option value="" disabled>
+                          Switch saved company ({savedProfiles.length})...
+                        </option>
+                        {savedProfiles.map(p => (
+                          <option key={p.id} value={p.id}>
+                            {p.profileName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {saveToast && (
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/90 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-md">
+                      <Check className="w-3.5 h-3.5" />
+                      {saveToast}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 shrink-0">
+                  <button
+                    type="button"
+                    onClick={handleQuickSaveProfile}
+                    className="min-h-[38px] px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>{activeProfile ? 'Save Changes to Profile' : 'Save Company Profile'}</span>
+                  </button>
+
+                  {activeProfile && (
+                    <button
+                      type="button"
+                      onClick={() => handleSaveNewProfile()}
+                      className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1 transition-colors"
+                      title="Save current form as a separate new company profile"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Save as New</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => setIsProfileModalOpen(true)}
+                    className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+                  >
+                    <FolderOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <span>Saved Profiles ({savedProfiles.length})</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2037,6 +2389,24 @@ export default function App() {
           </button>
         </div>
       </div>
+
+      {/* Saved Company Profiles Modal */}
+      <CompanyProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        profiles={savedProfiles}
+        activeProfileId={activeProfileId}
+        currentFormData={formData}
+        onSaveNewProfile={handleSaveNewProfile}
+        onUpdateProfile={handleUpdateProfile}
+        onLoadProfile={handleLoadProfile}
+        onDeleteProfile={handleDeleteProfile}
+        onDuplicateProfile={handleDuplicateProfile}
+        onRenameProfile={handleRenameProfile}
+        onImportProfiles={handleImportProfiles}
+        onStartNewBlankCompany={handleStartNewBlankCompany}
+      />
     </div>
   );
 }
+

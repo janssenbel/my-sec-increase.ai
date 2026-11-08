@@ -80,3 +80,13 @@ export interface SecFormData {
   // 7. Subscribers
   subscribers: Subscriber[];
 }
+
+export interface SavedCompanyProfile {
+  id: string;
+  profileName: string;
+  corpName: string;
+  createdAt: string;
+  updatedAt: string;
+  data: SecFormData;
+}
+

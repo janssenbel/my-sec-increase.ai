@@ -100,3 +100,75 @@ export const initialFormData: SecFormData = {
     },
   ],
 };
+
+export function createBlankFormData(): SecFormData {
+  const today = new Date().toISOString().split('T')[0];
+  return {
+    corpName: '',
+    formerCorpName: '',
+    principalAddress: '',
+    execCity: '',
+    execDate: today,
+
+    parValue: 100.0,
+    oldShares: 0,
+    newShares: 0,
+
+    currentStockholders: [
+      {
+        id: `cs-${Date.now()}`,
+        nameAndNationality: '',
+        shareClass: 'Common',
+        shares: 0,
+        amountSubscribed: 0,
+        amountPaid: 0,
+      },
+    ],
+    treasuryShares: 0,
+    treasurySubscribed: 0,
+    treasuryPaid: 0,
+
+    shMeetingDate: today,
+    bodMeetingDate: today,
+    meetingFormat: 'at the principal office',
+    amendedArticle: 'Article VII – Authorized Capital Stock',
+    chkSec37: false,
+    chkSec38: true,
+    chkSec42: false,
+
+    presName: '',
+    presTIN: '',
+    treasName: '',
+    treasTIN: '',
+    secName: '',
+    secTIN: '',
+    chairName: '',
+    meetingSecName: '',
+
+    directors: [
+      {
+        id: `dir-${Date.now()}`,
+        name: '',
+        tin: '',
+        evidenceId: '',
+      },
+    ],
+
+    subscribers: [
+      {
+        id: `sub-${Date.now()}`,
+        name: '',
+        nationality: 'Filipino',
+        residentialAddress: '',
+        sharesSubscribed: 0,
+        subscriptionPricePerShare: 100,
+        amountPaid: 0,
+        modeOfPayment: 'Cash',
+        tin: '',
+        evidenceId: '',
+        liabilityDescription: '',
+      },
+    ],
+  };
+}
+
