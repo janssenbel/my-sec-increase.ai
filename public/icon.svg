@@ -5,22 +5,14 @@
       <stop offset="50%" stop-color="#facc15" />
       <stop offset="100%" stop-color="#eab308" />
     </linearGradient>
-    <linearGradient id="badge" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#16a34a" />
-      <stop offset="100%" stop-color="#15803d" />
-    </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)" />
-  <rect x="116" y="92" width="232" height="290" rx="28" fill="#ffffff" />
-  <polygon points="156,192 232,140 308,192" fill="#14532d" />
-  <rect x="156" y="194" width="152" height="12" rx="4" fill="#15803d" />
-  <rect x="176" y="212" width="16" height="42" rx="4" fill="#166534" />
-  <rect x="224" y="212" width="16" height="42" rx="4" fill="#166534" />
-  <rect x="272" y="212" width="16" height="42" rx="4" fill="#166534" />
-  <rect x="156" y="258" width="152" height="10" rx="4" fill="#14532d" />
-  <rect x="164" y="288" width="136" height="12" rx="6" fill="#86efac" />
-  <rect x="164" y="314" width="120" height="12" rx="6" fill="#86efac" />
-  <rect x="164" y="340" width="104" height="12" rx="6" fill="#86efac" />
-  <circle cx="336" cy="330" r="84" fill="url(#badge)" />
-  <path d="M336 366 V294 M302 326 L336 292 L370 326" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <path
+    d="M256 384 V136 M144 244 L256 132 L368 244"
+    stroke="#15803d"
+    stroke-width="64"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    fill="none"
+  />
 </svg>

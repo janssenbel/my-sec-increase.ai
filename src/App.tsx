@@ -264,7 +264,7 @@ export default function App() {
     triggerSaveToast('Started new blank company');
   };
 
-  const appIconUrl = `${import.meta.env.BASE_URL}icon.svg?v=yellow`;
+  const appIconUrl = `${import.meta.env.BASE_URL}apple-touch-icon.png?v=greenarrow1`;
   const mainScrollRef = useRef<HTMLElement | null>(null);
 
   const scrollToTop = () => {
