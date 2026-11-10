@@ -22,8 +22,30 @@
   }
 }
 
-/* Dark mode form inputs & controls (strictly screen-only and outside A4 document paper) */
+/* Dark mode form inputs & controls and iOS standalone anti-blur scroll lock (strictly screen-only) */
 @media screen {
+  html,
+  body {
+    height: 100dvh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background-color: #0f172a;
+  }
+
+  #root {
+    height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  header {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+
   html.dark {
     color-scheme: dark;
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   FileText,
   Printer,
@@ -265,6 +265,12 @@ export default function App() {
   };
 
   const appIconUrl = `${import.meta.env.BASE_URL}apple-touch-icon.png`;
+  const mainScrollRef = useRef<HTMLElement | null>(null);
+
+  const scrollToTop = () => {
+    mainScrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const scrollToSection = (id: string) => {
     const el = document.getElementById(id);
@@ -505,9 +511,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:min-h-0">
-      {/* Top Application Header (Scrolls naturally on iPhone so iOS top status-bar blur never covers it; sticky on desktop) */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 pt-[env(safe-area-inset-top)] relative md:sticky md:top-0 z-40 shadow-md print:hidden no-print">
+    <div className="h-dvh overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:h-auto print:min-h-0 print:overflow-visible">
+      {/* Top Application Header (Fixed flex-child above inner scroll container so iOS standalone status bar blur never activates) */}
+      <header className="shrink-0 bg-slate-900 text-white border-b border-slate-800 pt-[env(safe-area-inset-top)] relative z-40 shadow-md print:hidden no-print">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
             <img
@@ -577,7 +583,7 @@ export default function App() {
                 type="button"
                 onClick={() => {
                   setViewMode('preview');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollToTop();
                 }}
                 className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   viewMode === 'preview'
@@ -621,8 +627,12 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main Content Area (Extra bottom padding on mobile so thumb bar never overlaps content) */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 pt-3 pb-24 sm:px-4 md:p-6 md:pb-10 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
+      {/* Main Content Area (Dedicated inner scroll container so root window never scrolls on iOS) */}
+      <main
+        ref={mainScrollRef}
+        className="flex-1 overflow-y-auto overflow-x-hidden overscroll-y-contain w-full print:p-0 print:m-0 print:max-w-none print:w-full print:block print:overflow-visible"
+      >
+        <div className="max-w-7xl w-full mx-auto px-3 pt-3 pb-8 sm:px-4 md:p-6 md:pb-10 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
         {/* Compliance & Summary Banner */}
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
@@ -2297,7 +2307,7 @@ export default function App() {
                 type="button"
                 onClick={() => {
                   setViewMode('preview');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                  scrollToTop();
                 }}
                 className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
@@ -2377,7 +2387,7 @@ export default function App() {
                   type="button"
                   onClick={() => {
                     setViewMode('form');
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    scrollToTop();
                   }}
                   className="min-h-[38px] px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-slate-200 font-medium transition-colors"
                 >
@@ -2493,17 +2503,18 @@ export default function App() {
             fitMobileScreen={fitMobileScreen}
           />
         </div>
+        </div>
       </main>
 
-      {/* Mobile Fixed Thumb-Zone Bottom Action Bar (< 768px) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+      {/* Mobile Solid Thumb-Zone Bottom Action Bar (< 768px) */}
+      <div className="md:hidden shrink-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
         {viewMode === 'form' ? (
           <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
             <button
               type="button"
               onClick={() => {
                 setViewMode('preview');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                scrollToTop();
               }}
               className="min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
@@ -2527,7 +2538,7 @@ export default function App() {
               type="button"
               onClick={() => {
                 setViewMode('form');
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                scrollToTop();
               }}
               className="min-h-[44px] px-2.5 py-2 bg-slate-700 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1 shadow-xs"
             >
