@@ -32,7 +32,7 @@
     padding: 0;
     overflow: hidden;
     overscroll-behavior: none;
-    background-color: #0f172a;
+    background-color: #15803d;
   }
 
   #root {
@@ -51,25 +51,25 @@
   }
 
   html.dark label {
-    color: #cbd5e1;
+    color: #d1fae5;
   }
 
   html.dark input:not([type="checkbox"]),
   html.dark select,
   html.dark textarea {
-    background-color: #0f172a;
-    color: #f8fafc;
-    border-color: #334155;
+    background-color: #022c22;
+    color: #f0fdf4;
+    border-color: #065f46;
   }
 
   html.dark input:not([type="checkbox"])::placeholder,
   html.dark textarea::placeholder {
-    color: #64748b;
+    color: #6ee7b7;
   }
 
   html.dark input[readonly] {
-    background-color: #1e293b;
-    color: #cbd5e1;
+    background-color: #064e3b;
+    color: #d1fae5;
   }
 }
 

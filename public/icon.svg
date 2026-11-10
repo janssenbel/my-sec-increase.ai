@@ -1,26 +1,26 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a" />
-      <stop offset="50%" stop-color="#1e3a8a" />
-      <stop offset="100%" stop-color="#1d4ed8" />
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="50%" stop-color="#facc15" />
+      <stop offset="100%" stop-color="#eab308" />
     </linearGradient>
     <linearGradient id="badge" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#10b981" />
-      <stop offset="100%" stop-color="#059669" />
+      <stop offset="0%" stop-color="#16a34a" />
+      <stop offset="100%" stop-color="#15803d" />
     </linearGradient>
   </defs>
   <rect width="512" height="512" fill="url(#bg)" />
-  <rect x="120" y="96" width="228" height="284" rx="28" fill="#ffffff" />
-  <polygon points="160,194 234,144 308,194" fill="#1e3a8a" />
-  <rect x="160" y="196" width="148" height="12" rx="4" fill="#2563eb" />
-  <rect x="180" y="214" width="16" height="40" rx="4" fill="#1e40af" />
-  <rect x="226" y="214" width="16" height="40" rx="4" fill="#1e40af" />
-  <rect x="272" y="214" width="16" height="40" rx="4" fill="#1e40af" />
-  <rect x="160" y="258" width="148" height="10" rx="4" fill="#1e3a8a" />
-  <rect x="166" y="288" width="136" height="12" rx="6" fill="#94a3b8" />
-  <rect x="166" y="314" width="120" height="12" rx="6" fill="#94a3b8" />
-  <rect x="166" y="340" width="104" height="12" rx="6" fill="#94a3b8" />
-  <circle cx="332" cy="326" r="84" fill="url(#badge)" />
-  <path d="M332 362 V290 M298 322 L332 288 L366 322" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+  <rect x="116" y="92" width="232" height="290" rx="28" fill="#ffffff" />
+  <polygon points="156,192 232,140 308,192" fill="#14532d" />
+  <rect x="156" y="194" width="152" height="12" rx="4" fill="#15803d" />
+  <rect x="176" y="212" width="16" height="42" rx="4" fill="#166534" />
+  <rect x="224" y="212" width="16" height="42" rx="4" fill="#166534" />
+  <rect x="272" y="212" width="16" height="42" rx="4" fill="#166534" />
+  <rect x="156" y="258" width="152" height="10" rx="4" fill="#14532d" />
+  <rect x="164" y="288" width="136" height="12" rx="6" fill="#86efac" />
+  <rect x="164" y="314" width="120" height="12" rx="6" fill="#86efac" />
+  <rect x="164" y="340" width="104" height="12" rx="6" fill="#86efac" />
+  <circle cx="336" cy="330" r="84" fill="url(#badge)" />
+  <path d="M336 366 V294 M302 326 L336 292 L370 326" stroke="#ffffff" stroke-width="20" stroke-linecap="round" stroke-linejoin="round" fill="none" />
 </svg>

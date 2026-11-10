@@ -200,19 +200,19 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-slate-950/60 backdrop-blur-xs p-0 sm:p-4 print:hidden no-print">
-      <div className="bg-white dark:bg-slate-900 border-t sm:border border-slate-200 dark:border-slate-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-emerald-950/60 backdrop-blur-xs p-0 sm:p-4 print:hidden no-print">
+      <div className="bg-white dark:bg-emerald-950 border-t sm:border border-emerald-200 dark:border-emerald-800 rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
         {/* Modal Header */}
-        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-900 text-white flex items-center justify-between gap-3 border-b border-slate-800">
+        <div className="px-4 sm:px-6 py-3.5 sm:py-4 bg-emerald-800 dark:bg-emerald-900 text-white flex items-center justify-between gap-3 border-b border-emerald-700 dark:border-emerald-800">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="p-2 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 shrink-0">
+            <div className="p-2 rounded-xl bg-yellow-400 text-emerald-950 shadow-xs shrink-0">
               <Building2 className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <h2 className="text-sm sm:text-base font-bold text-white truncate">
                 Saved Company Profiles
               </h2>
-              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+              <p className="text-[11px] sm:text-xs text-emerald-100 truncate">
                 Save, load, switch, or back up company profiles &amp; capital stock setups
               </p>
             </div>
@@ -220,7 +220,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="min-h-[36px] min-w-[36px] p-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors"
+            className="min-h-[36px] min-w-[36px] p-1.5 rounded-xl bg-emerald-900/60 hover:bg-emerald-700 text-emerald-100 hover:text-white flex items-center justify-center transition-colors"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -229,20 +229,20 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
 
         {/* Status Feedback Toast inside Modal */}
         {statusMessage && (
-          <div className="px-4 sm:px-6 py-2 bg-emerald-50 dark:bg-emerald-950/80 border-b border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2">
+          <div className="px-4 sm:px-6 py-2 bg-emerald-50 dark:bg-emerald-900/80 border-b border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold flex items-center gap-2">
             <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
             <span>{statusMessage}</span>
           </div>
         )}
 
         {/* Save Current Form Section */}
-        <div className="p-4 sm:px-6 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800 space-y-3">
+        <div className="p-4 sm:px-6 bg-emerald-50/60 dark:bg-emerald-900/40 border-b border-emerald-100 dark:border-emerald-800 space-y-3">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div className="min-w-0">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 block">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400 block">
                 Current Working Corporation
               </span>
-              <div className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+              <div className="text-sm font-bold text-slate-900 dark:text-white truncate">
                 {currentFormData.corpName || 'Untitled Corporation'}
               </div>
             </div>
@@ -255,7 +255,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                     onUpdateProfile(activeProfileId);
                     showNotice('Updated active company profile.');
                   }}
-                  className="min-h-[36px] px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
+                  className="min-h-[36px] px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
                 >
                   <Save className="w-3.5 h-3.5" />
                   <span>Update Active Profile</span>
@@ -268,9 +268,9 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                   onStartNewBlankCompany();
                   showNotice('Started a new blank company form.');
                 }}
-                className="min-h-[36px] px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+                className="min-h-[36px] px-3 py-1.5 bg-white dark:bg-emerald-950 hover:bg-emerald-50 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
               >
-                <FilePlus2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                <FilePlus2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                 <span>New Blank Company</span>
               </button>
             </div>
@@ -282,11 +282,11 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
               value={newProfileLabel}
               onChange={e => setNewProfileLabel(e.target.value)}
               placeholder={`Profile label (defaults to "${currentFormData.corpName || 'Untitled Corporation'}")`}
-              className="flex-1 px-3 py-2 text-xs sm:text-sm bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-3 py-2 text-xs sm:text-sm bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-600"
             />
             <button
               type="submit"
-              className="min-h-[40px] px-4 py-2 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 shrink-0 transition-colors"
+              className="min-h-[40px] px-4 py-2 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white text-xs font-bold rounded-xl shadow-xs flex items-center justify-center gap-1.5 shrink-0 transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Save as New Profile</span>
@@ -295,15 +295,15 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
         </div>
 
         {/* Search & Backup Bar */}
-        <div className="px-4 sm:px-6 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2">
+        <div className="px-4 sm:px-6 py-2.5 bg-white dark:bg-emerald-950 border-b border-emerald-100 dark:border-emerald-800 flex flex-wrap items-center justify-between gap-2">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <Search className="w-3.5 h-3.5 text-emerald-600/70 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="Search saved companies by name, address, or officer..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-emerald-50/50 dark:bg-emerald-900/50 border border-emerald-200 dark:border-emerald-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
             />
           </div>
 
@@ -318,7 +318,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="min-h-[34px] px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-colors"
+              className="min-h-[34px] px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold rounded-lg border border-emerald-200 dark:border-emerald-700 flex items-center gap-1.5 transition-colors"
               title="Import company profile(s) from a .json file"
             >
               <Upload className="w-3.5 h-3.5" />
@@ -329,7 +329,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
               <button
                 type="button"
                 onClick={handleExportAll}
-                className="min-h-[34px] px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 flex items-center gap-1.5 transition-colors"
+                className="min-h-[34px] px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold rounded-lg border border-emerald-200 dark:border-emerald-700 flex items-center gap-1.5 transition-colors"
                 title="Download all saved company profiles as a .json backup file"
               >
                 <Download className="w-3.5 h-3.5" />
@@ -342,14 +342,14 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
         {/* Profiles List */}
         <div className="flex-1 overflow-y-auto p-4 sm:px-6 space-y-3">
           {filteredProfiles.length === 0 ? (
-            <div className="text-center py-10 px-4 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
-              <Building2 className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+            <div className="text-center py-10 px-4 rounded-2xl border border-dashed border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-900/20">
+              <Building2 className="w-8 h-8 text-emerald-600/60 mx-auto mb-2" />
+              <p className="text-sm font-semibold text-slate-700 dark:text-emerald-200">
                 {profiles.length === 0
                   ? 'No saved company profiles yet'
                   : 'No matching company profiles found'}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+              <p className="text-xs text-slate-500 dark:text-emerald-400 mt-1 max-w-md mx-auto">
                 {profiles.length === 0
                   ? 'Click "Save as New Profile" above to save the current corporation, officers, stockholders, and capital structure for quick reuse.'
                   : 'Try clearing your search filter above.'}
@@ -369,8 +369,8 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                   key={profile.id}
                   className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
                     isActive
-                      ? 'border-blue-500 dark:border-blue-500 bg-blue-50/40 dark:bg-blue-950/30 shadow-xs'
-                      : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'
+                      ? 'border-emerald-600 dark:border-emerald-500 bg-emerald-50/60 dark:bg-emerald-900/40 shadow-xs'
+                      : 'border-emerald-100 dark:border-emerald-800 bg-white dark:bg-emerald-950 hover:border-emerald-300 dark:hover:border-emerald-700'
                   }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
@@ -382,7 +382,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                               type="text"
                               value={editingName}
                               onChange={e => setEditingName(e.target.value)}
-                              className="px-2.5 py-1 text-xs font-bold bg-white dark:bg-slate-800 border border-blue-400 rounded-lg"
+                              className="px-2.5 py-1 text-xs font-bold bg-white dark:bg-emerald-900 border border-emerald-500 rounded-lg"
                               autoFocus
                             />
                             <button
@@ -394,7 +394,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                                 }
                                 setEditingProfileId(null);
                               }}
-                              className="p-1.5 bg-blue-600 text-white rounded-lg text-xs"
+                              className="p-1.5 bg-emerald-700 text-white rounded-lg text-xs"
                               title="Save Name"
                             >
                               <Check className="w-3.5 h-3.5" />
@@ -402,7 +402,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                             <button
                               type="button"
                               onClick={() => setEditingProfileId(null)}
-                              className="p-1.5 bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-lg text-xs"
+                              className="p-1.5 bg-slate-200 dark:bg-emerald-800 text-slate-700 dark:text-emerald-200 rounded-lg text-xs"
                               title="Cancel"
                             >
                               <X className="w-3.5 h-3.5" />
@@ -410,7 +410,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                           </div>
                         ) : (
                           <>
-                            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white truncate">
                               {profile.profileName}
                             </h3>
                             <button
@@ -419,7 +419,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                                 setEditingProfileId(profile.id);
                                 setEditingName(profile.profileName);
                               }}
-                              className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded"
+                              className="p-1 text-slate-400 hover:text-emerald-700 dark:hover:text-emerald-300 rounded"
                               title="Rename profile label"
                             >
                               <Edit2 className="w-3 h-3" />
@@ -428,7 +428,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                         )}
 
                         {isActive && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-blue-600 text-white">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-emerald-700 text-white">
                             <BookmarkCheck className="w-3 h-3" />
                             Active
                           </span>
@@ -436,19 +436,19 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                       </div>
 
                       {profile.corpName && profile.corpName !== profile.profileName && (
-                        <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+                        <div className="text-xs font-semibold text-slate-700 dark:text-emerald-200">
                           Corp Name: {profile.corpName}
                         </div>
                       )}
 
                       {profile.data.principalAddress && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-xs text-slate-500 dark:text-emerald-400 truncate">
                           {profile.data.principalAddress}
                         </p>
                       )}
 
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[11px] text-slate-600 dark:text-slate-400">
-                        <span className="font-medium text-slate-800 dark:text-slate-200">
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[11px] text-slate-600 dark:text-emerald-300">
+                        <span className="font-medium text-emerald-900 dark:text-emerald-100">
                           ACS: Php {fmtNum(oldAcs)} &rarr; Php {fmtNum(newAcs)}
                         </span>
                         <span>&bull;</span>
@@ -459,14 +459,14 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                         <span>{profile.data.subscribers?.length || 0} Subscribers</span>
                       </div>
 
-                      <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-slate-500 pt-0.5">
+                      <div className="flex items-center gap-1 text-[11px] text-slate-400 dark:text-emerald-500 pt-0.5">
                         <Clock className="w-3 h-3" />
                         <span>Last saved {formatTimestamp(profile.updatedAt)}</span>
                       </div>
                     </div>
 
                     {/* Profile Actions */}
-                    <div className="flex flex-wrap sm:flex-col items-stretch sm:items-end justify-end gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-slate-800">
+                    <div className="flex flex-wrap sm:flex-col items-stretch sm:items-end justify-end gap-1.5 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-emerald-100 dark:border-emerald-800">
                       <div className="flex items-center gap-1.5">
                         <button
                           type="button"
@@ -475,7 +475,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                             showNotice(`Loaded "${profile.profileName}".`);
                             onClose();
                           }}
-                          className="min-h-[34px] px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-2xs transition-colors"
+                          className="min-h-[34px] px-3 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl flex items-center gap-1.5 shadow-2xs transition-colors"
                         >
                           <FolderOpen className="w-3.5 h-3.5" />
                           <span>Load</span>
@@ -487,7 +487,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                             onUpdateProfile(profile.id);
                             showNotice(`Updated "${profile.profileName}" with current form data.`);
                           }}
-                          className="min-h-[34px] px-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 flex items-center gap-1 transition-colors"
+                          className="min-h-[34px] px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs font-semibold rounded-xl border border-emerald-200 dark:border-emerald-700 flex items-center gap-1 transition-colors"
                           title="Overwrite this saved profile with the current form values"
                         >
                           <Save className="w-3.5 h-3.5" />
@@ -502,7 +502,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                             onDuplicateProfile(profile);
                             showNotice(`Duplicated "${profile.profileName}".`);
                           }}
-                          className="min-h-[32px] p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                          className="min-h-[32px] p-1.5 text-slate-500 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-100 hover:bg-emerald-50 dark:hover:bg-emerald-900 rounded-lg transition-colors"
                           title="Duplicate Profile"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -511,7 +511,7 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
                         <button
                           type="button"
                           onClick={() => handleExportSingle(profile)}
-                          className="min-h-[32px] p-1.5 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+                          className="min-h-[32px] p-1.5 text-slate-500 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-100 hover:bg-emerald-50 dark:hover:bg-emerald-900 rounded-lg transition-colors"
                           title="Export this profile as JSON"
                         >
                           <Download className="w-3.5 h-3.5" />
@@ -558,14 +558,14 @@ export const CompanyProfileModal: React.FC<CompanyProfileModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="px-4 sm:px-6 py-3 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+        <div className="px-4 sm:px-6 py-3 bg-emerald-50/70 dark:bg-emerald-950 border-t border-emerald-100 dark:border-emerald-800 flex items-center justify-between text-xs text-slate-600 dark:text-emerald-300">
           <span>
             {profiles.length} saved company profile{profiles.length === 1 ? '' : 's'} stored on this device
           </span>
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-1.5 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-xl transition-colors"
+            className="px-4 py-1.5 bg-emerald-700 hover:bg-emerald-800 text-white font-semibold rounded-xl transition-colors"
           >
             Done
           </button>

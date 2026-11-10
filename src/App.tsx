@@ -264,7 +264,7 @@ export default function App() {
     triggerSaveToast('Started new blank company');
   };
 
-  const appIconUrl = `${import.meta.env.BASE_URL}apple-touch-icon.png`;
+  const appIconUrl = `${import.meta.env.BASE_URL}icon.svg?v=yellow`;
   const mainScrollRef = useRef<HTMLElement | null>(null);
 
   const scrollToTop = () => {
@@ -511,21 +511,21 @@ export default function App() {
   };
 
   return (
-    <div className="h-dvh overflow-hidden bg-slate-100 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:h-auto print:min-h-0 print:overflow-visible">
+    <div className="h-dvh overflow-hidden bg-emerald-50/40 dark:bg-emerald-950 text-slate-900 dark:text-emerald-50 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:h-auto print:min-h-0 print:overflow-visible">
       {/* Top Application Header (Fixed flex-child above inner scroll container so iOS standalone status bar blur never activates) */}
-      <header className="shrink-0 bg-slate-900 text-white border-b border-slate-800 pt-[env(safe-area-inset-top)] relative z-40 shadow-md print:hidden no-print">
+      <header className="shrink-0 bg-emerald-800 dark:bg-emerald-950 text-white border-b border-emerald-700 dark:border-emerald-900 pt-[env(safe-area-inset-top)] relative z-40 shadow-md print:hidden no-print">
         <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
             <img
               src={appIconUrl}
               alt="SEC Capital Increase Icon"
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-sm shrink-0"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-sm shrink-0 bg-yellow-400"
             />
             <div className="min-w-0">
               <h1 className="text-sm sm:text-base font-bold tracking-tight text-white leading-tight truncate">
                 SEC Capital Increase Generator
               </h1>
-              <p className="text-[11px] sm:text-xs text-slate-400 truncate">
+              <p className="text-[11px] sm:text-xs text-emerald-100 truncate">
                 PH SEC Increase in ACS &bull; A4 Legal Compliant
               </p>
             </div>
@@ -536,13 +536,13 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsProfileModalOpen(true)}
-              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-100 border border-slate-700 flex items-center gap-1.5 text-xs font-semibold transition-colors"
+              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-900/70 hover:bg-emerald-700 active:bg-emerald-600 text-white border border-emerald-700 flex items-center gap-1.5 text-xs font-semibold transition-colors"
               title="Open Saved Company Profiles"
             >
-              <FolderOpen className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+              <FolderOpen className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
               <span className="hidden sm:inline">Profiles</span>
               {savedProfiles.length > 0 && (
-                <span className="px-1.5 py-0.2 bg-blue-600 text-white text-[10px] font-bold rounded-full">
+                <span className="px-1.5 py-0.2 bg-yellow-400 text-emerald-950 text-[10px] font-bold rounded-full">
                   {savedProfiles.length}
                 </span>
               )}
@@ -554,24 +554,24 @@ export default function App() {
               onClick={() => setDarkMode(prev => !prev)}
               aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className="min-h-[38px] min-w-[38px] p-2 rounded-xl bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-slate-200 border border-slate-700 flex items-center justify-center transition-colors"
+              className="min-h-[38px] min-w-[38px] p-2 rounded-xl bg-emerald-900/70 hover:bg-emerald-700 active:bg-emerald-600 text-white border border-emerald-700 flex items-center justify-center transition-colors"
             >
               {darkMode ? (
-                <Sun className="w-4 h-4 text-amber-400" />
+                <Sun className="w-4 h-4 text-yellow-300" />
               ) : (
-                <Moon className="w-4 h-4 text-slate-300" />
+                <Moon className="w-4 h-4 text-emerald-100" />
               )}
             </button>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-slate-800 p-1 rounded-xl border border-slate-700">
+            <div className="flex items-center bg-emerald-900/80 p-1 rounded-xl border border-emerald-700">
               <button
                 type="button"
                 onClick={() => setViewMode('form')}
                 className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   viewMode === 'form'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-white text-emerald-900 shadow-sm'
+                    : 'text-emerald-100 hover:text-white'
                 }`}
               >
                 <Edit3 className="w-3.5 h-3.5" />
@@ -587,8 +587,8 @@ export default function App() {
                 }}
                 className={`flex items-center justify-center gap-1.5 min-h-[36px] sm:min-h-0 px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
                   viewMode === 'preview'
-                    ? 'bg-blue-600 text-white shadow-sm'
-                    : 'text-slate-300 hover:text-white'
+                    ? 'bg-white text-emerald-900 shadow-sm'
+                    : 'text-emerald-100 hover:text-white'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
@@ -601,10 +601,10 @@ export default function App() {
               type="button"
               disabled={isGeneratingZip}
               onClick={() => handleDownloadZip('both')}
-              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              className="hidden md:flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-emerald-50 disabled:opacity-60 text-emerald-900 text-xs font-bold rounded-lg shadow-sm transition-colors"
               title="Download ZIP containing separate PDF and Microsoft Word (.doc) files for every SEC document"
             >
-              <Download className="w-3.5 h-3.5" />
+              <Download className="w-3.5 h-3.5 text-emerald-700" />
               <span>{isGeneratingZip ? 'Generating ZIP...' : 'Download ZIP (PDF & Word)'}</span>
             </button>
 
@@ -616,7 +616,7 @@ export default function App() {
                 }
                 window.print();
               }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg border border-emerald-600 shadow-sm transition-colors"
               title="Print all documents"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -634,7 +634,7 @@ export default function App() {
       >
         <div className="max-w-7xl w-full mx-auto px-3 pt-3 pb-8 sm:px-4 md:p-6 md:pb-10 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
         {/* Compliance & Summary Banner */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
+        <div className="bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-3.5 sm:p-4 mb-4 sm:mb-6 print:hidden no-print">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 sm:gap-4">
             <div className="flex items-start sm:items-center gap-3">
               <div
@@ -652,7 +652,7 @@ export default function App() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">
+                  <h3 className="text-xs sm:text-sm font-bold text-emerald-950 dark:text-emerald-50">
                     SEC 25%-25% Statutory Capital Rule
                   </h3>
                   <span
@@ -665,9 +665,9 @@ export default function App() {
                     {isSubCompliant && isPaidCompliant ? 'Compliant' : 'Review Required'}
                   </span>
                 </div>
-                <div className="text-xs text-slate-600 dark:text-slate-400 mt-1.5 grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1">
+                <div className="text-xs text-slate-600 dark:text-emerald-200 mt-1.5 grid grid-cols-1 sm:flex sm:flex-wrap gap-x-4 gap-y-1">
                   <span>
-                    Increase: <b className="text-slate-900 dark:text-slate-100">Php {fmtNum(increase)}</b>
+                    Increase: <b className="text-emerald-950 dark:text-white">Php {fmtNum(increase)}</b>
                   </span>
                   <span>
                     25% Subscribed:&nbsp;
@@ -686,21 +686,21 @@ export default function App() {
             </div>
 
             {/* Documents Generated Info */}
-            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs border-t lg:border-t-0 pt-2.5 lg:pt-0 border-slate-100 dark:border-slate-800">
-              <span className="text-slate-500 dark:text-slate-400 font-medium">Auto-Generated:</span>
-              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700 font-medium">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs border-t lg:border-t-0 pt-2.5 lg:pt-0 border-emerald-100 dark:border-emerald-800">
+              <span className="text-slate-500 dark:text-emerald-300 font-medium">Auto-Generated:</span>
+              <span className="px-2 py-1 bg-emerald-50 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded-md border border-emerald-200 dark:border-emerald-700 font-medium">
                 Unified Cert
               </span>
-              <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-md border border-slate-200 dark:border-slate-700 font-medium">
+              <span className="px-2 py-1 bg-emerald-50 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 rounded-md border border-emerald-200 dark:border-emerald-700 font-medium">
                 Treasurer&rsquo;s Affidavit
               </span>
               {cashSubCount > 0 && (
-                <span className="px-2 py-1 bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 rounded-md border border-blue-200 dark:border-blue-800/60 font-medium">
+                <span className="px-2 py-1 bg-emerald-100/80 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 rounded-md border border-emerald-300 dark:border-emerald-800 font-medium">
                   {cashSubCount} Cash Contract{cashSubCount > 1 ? 's' : ''}
                 </span>
               )}
               {convSubCount > 0 && (
-                <span className="px-2 py-1 bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 rounded-md border border-purple-200 dark:border-purple-800/60 font-medium">
+                <span className="px-2 py-1 bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 rounded-md border border-teal-200 dark:border-teal-800/60 font-medium">
                   {convSubCount} Deed{convSubCount > 1 ? 's' : ''} of Assignment
                 </span>
               )}
@@ -728,7 +728,7 @@ export default function App() {
                     key={item.id}
                     type="button"
                     onClick={() => scrollToSection(item.id)}
-                    className="px-3 py-2 min-h-[38px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-200 active:bg-blue-50 dark:active:bg-blue-950 active:border-blue-300 active:text-blue-700 shadow-2xs shrink-0"
+                    className="px-3 py-2 min-h-[38px] bg-white dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-semibold text-emerald-900 dark:text-emerald-100 active:bg-emerald-50 dark:active:bg-emerald-950 active:border-emerald-400 active:text-emerald-800 shadow-2xs shrink-0"
                   >
                     {item.label}
                   </button>
@@ -739,11 +739,11 @@ export default function App() {
             {/* 1. Corporate Details Card */}
             <section
               id="sec-1-corp"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
-                  <Building2 className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+              <div className="flex flex-wrap items-center justify-between gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
+                <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-sm sm:text-base">
+                  <Building2 className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                   <span>1. Corporate Information</span>
                 </div>
 
@@ -751,10 +751,10 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleStartNewBlankCompany}
-                    className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
+                    className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-emerald-800 dark:text-emerald-200 hover:text-emerald-950 dark:hover:text-white bg-emerald-50/70 dark:bg-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-800 rounded-lg border border-emerald-200 dark:border-emerald-700 transition-colors shrink-0"
                     title="Clear form to start a new blank corporation"
                   >
-                    <FilePlus2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <FilePlus2 className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                     <span>New Blank</span>
                   </button>
 
@@ -773,7 +773,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => setConfirmResetSample(false)}
-                        className="px-1.5 py-0.5 text-slate-600 dark:text-slate-300 text-[11px]"
+                        className="px-1.5 py-0.5 text-slate-600 dark:text-emerald-200 text-[11px]"
                       >
                         No
                       </button>
@@ -782,7 +782,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => setConfirmResetSample(true)}
-                      className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-slate-500 dark:text-slate-300 hover:text-slate-800 dark:hover:text-white bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg border border-slate-200 dark:border-slate-700 transition-colors shrink-0"
+                      className="flex items-center gap-1 min-h-[36px] px-2.5 py-1 text-xs font-medium text-emerald-700 dark:text-emerald-200 hover:text-emerald-950 dark:hover:text-white bg-emerald-50/70 dark:bg-emerald-900 hover:bg-emerald-100 dark:hover:bg-emerald-800 rounded-lg border border-emerald-200 dark:border-emerald-700 transition-colors shrink-0"
                       title="Load sample corporation data"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
@@ -793,19 +793,19 @@ export default function App() {
               </div>
 
               {/* Company Profile Save & Switch Bar */}
-              <div className="mb-5 p-3 sm:p-3.5 rounded-xl bg-blue-50/70 dark:bg-slate-800/70 border border-blue-200/80 dark:border-slate-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+              <div className="mb-5 p-3 sm:p-3.5 rounded-xl bg-emerald-50/80 dark:bg-emerald-900/60 border border-emerald-200 dark:border-emerald-700 flex flex-col lg:flex-row lg:items-center justify-between gap-3">
                 <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 min-w-0 flex-1">
                   <div className="flex items-center gap-2 min-w-0">
-                    <BookmarkCheck className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />
-                    <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 shrink-0">
+                    <BookmarkCheck className="w-4 h-4 text-emerald-700 dark:text-emerald-400 shrink-0" />
+                    <span className="text-xs font-semibold text-emerald-900 dark:text-emerald-200 shrink-0">
                       Company Profile:
                     </span>
                     {activeProfile ? (
-                      <span className="text-xs font-bold text-blue-800 dark:text-blue-300 bg-blue-100/80 dark:bg-blue-950/80 border border-blue-300 dark:border-blue-800 px-2.5 py-0.5 rounded-md truncate">
+                      <span className="text-xs font-bold text-emerald-900 dark:text-emerald-200 bg-white dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700 px-2.5 py-0.5 rounded-md truncate">
                         {activeProfile.profileName}
                       </span>
                     ) : (
-                      <span className="text-xs font-medium text-slate-600 dark:text-slate-400 italic truncate">
+                      <span className="text-xs font-medium text-emerald-800/80 dark:text-emerald-300 italic truncate">
                         {formData.corpName || 'Unsaved Working Draft'}
                       </span>
                     )}
@@ -824,7 +824,7 @@ export default function App() {
                             handleLoadProfile(found);
                           }
                         }}
-                        className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-800 dark:text-slate-200 max-w-[230px] truncate"
+                        className="px-2.5 py-1.5 text-xs font-medium bg-white dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700 rounded-lg text-slate-800 dark:text-emerald-100 max-w-[230px] truncate"
                       >
                         <option value="" disabled>
                           Switch saved company ({savedProfiles.length})...
@@ -839,7 +839,7 @@ export default function App() {
                   )}
 
                   {saveToast && (
-                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-100/90 dark:bg-emerald-950/80 border border-emerald-300 dark:border-emerald-800 px-2.5 py-0.5 rounded-md">
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-800 dark:text-emerald-300 bg-white dark:bg-emerald-950 border border-emerald-300 dark:border-emerald-700 px-2.5 py-0.5 rounded-md">
                       <Check className="w-3.5 h-3.5" />
                       {saveToast}
                     </span>
@@ -850,7 +850,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleQuickSaveProfile}
-                    className="min-h-[38px] px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
+                    className="min-h-[38px] px-3.5 py-1.5 bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white text-xs font-semibold rounded-xl shadow-2xs flex items-center gap-1.5 transition-colors"
                   >
                     <Save className="w-3.5 h-3.5" />
                     <span>{activeProfile ? 'Save Changes to Profile' : 'Save Company Profile'}</span>
@@ -860,7 +860,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleSaveNewProfile()}
-                      className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1 transition-colors"
+                      className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-emerald-950 hover:bg-emerald-50 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border border-emerald-300 dark:border-emerald-700 text-xs font-semibold rounded-xl flex items-center gap-1 transition-colors"
                       title="Save current form as a separate new company profile"
                     >
                       <Plus className="w-3.5 h-3.5" />
@@ -871,9 +871,9 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setIsProfileModalOpen(true)}
-                    className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
+                    className="min-h-[38px] px-3 py-1.5 bg-white dark:bg-emerald-950 hover:bg-emerald-50 dark:hover:bg-emerald-900 text-emerald-800 dark:text-emerald-100 border border-emerald-300 dark:border-emerald-700 text-xs font-semibold rounded-xl flex items-center gap-1.5 transition-colors"
                   >
-                    <FolderOpen className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
+                    <FolderOpen className="w-3.5 h-3.5 text-emerald-700 dark:text-emerald-400" />
                     <span>Saved Profiles ({savedProfiles.length})</span>
                   </button>
                 </div>
@@ -888,7 +888,7 @@ export default function App() {
                     type="text"
                     value={formData.corpName}
                     onChange={e => updateField('corpName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 font-medium"
                     placeholder="e.g. ABC HOLDINGS INC."
                   />
                 </div>
@@ -901,7 +901,7 @@ export default function App() {
                     type="text"
                     value={formData.formerCorpName}
                     onChange={e => updateField('formerCorpName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     placeholder="Leave blank if no prior name change"
                   />
                 </div>
@@ -914,7 +914,7 @@ export default function App() {
                     type="text"
                     value={formData.principalAddress}
                     onChange={e => updateField('principalAddress', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     placeholder="Unit, Building, Street, Barangay, City, Province"
                   />
                 </div>
@@ -928,7 +928,7 @@ export default function App() {
                       aria-label="Document Execution Year"
                       value={formData.execYear || String(new Date().getFullYear())}
                       onChange={e => updateField('execYear', e.target.value)}
-                      className="flex-1 px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                     >
                       <option value="2025">2025</option>
                       <option value="2026">2026</option>
@@ -948,8 +948,8 @@ export default function App() {
                           onClick={() => updateField('execYear', yr)}
                           className={`px-2.5 py-2 text-xs font-bold rounded-lg border transition-colors shrink-0 ${
                             isActive
-                              ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                              ? 'bg-emerald-700 text-white border-emerald-700 shadow-2xs'
+                              : 'bg-emerald-50 dark:bg-emerald-900 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-700 hover:bg-emerald-100 dark:hover:bg-emerald-800'
                           }`}
                         >
                           {yr}
@@ -964,16 +964,16 @@ export default function App() {
             {/* 2. Capital Stock Details Card */}
             <section
               id="sec-2-acs"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <Coins className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+              <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-sm sm:text-base mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
+                <Coins className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>2. Authorized Capital Stock (ACS) Structure</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Par Value per Share (Php)
                   </label>
                   <input
@@ -981,36 +981,36 @@ export default function App() {
                     step="0.01"
                     value={formData.parValue}
                     onChange={e => updateField('parValue', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Previous Authorized Shares
                   </label>
                   <input
                     type="number"
                     value={formData.oldShares}
                     onChange={e => updateField('oldShares', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  <span className="text-[11px] text-slate-500 dark:text-emerald-300 mt-0.5 block">
                     Previous ACS: Php {fmtNum(oldAcs)}
                   </span>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     New Authorized Shares
                   </label>
                   <input
                     type="number"
                     value={formData.newShares}
                     onChange={e => updateField('newShares', parseFloat(e.target.value) || 0)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-blue-700 dark:text-blue-400"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600 font-semibold text-emerald-800 dark:text-emerald-300"
                   />
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                  <span className="text-[11px] text-slate-500 dark:text-emerald-300 mt-0.5 block">
                     New ACS: Php {fmtNum(newAcs)}
                   </span>
                 </div>
@@ -1020,22 +1020,22 @@ export default function App() {
             {/* 3. Present Capital Stock (Item 3 Table) */}
             <section
               id="sec-3-stock"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex items-center justify-between gap-2 mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
-                    <Layers className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-sm sm:text-base">
+                    <Layers className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                     <span>3. Present Capital Stock (Item 3 Table)</span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-emerald-300 mt-0.5">
                     Current shareholdings as of the stockholders&rsquo; meeting approving the increase.
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={addCurrentStockholder}
-                  className="hidden sm:flex items-center gap-1 px-3 py-2 bg-blue-50 dark:bg-blue-950/60 hover:bg-blue-100 dark:hover:bg-blue-900/60 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors shrink-0"
+                  className="hidden sm:flex items-center gap-1 px-3 py-2 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Stockholder
@@ -1146,7 +1146,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addCurrentStockholder}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 dark:bg-blue-950/60 active:bg-blue-100 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 active:bg-emerald-100 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Current Stockholder
@@ -1155,8 +1155,8 @@ export default function App() {
 
               {/* Desktop Table for Current Stockholders (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
-                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
+                <table className="w-full text-left text-xs border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                  <thead className="bg-emerald-50/70 dark:bg-emerald-900/70 text-emerald-950 dark:text-emerald-100 font-semibold border-b border-emerald-200 dark:border-emerald-700">
                     <tr>
                       <th className="p-2.5">Name and Nationality</th>
                       <th className="p-2.5 w-28 text-center">Class of Shares</th>
@@ -1166,9 +1166,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tbody className="divide-y divide-emerald-100 dark:divide-emerald-800">
                     {formData.currentStockholders.map(s => (
-                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <tr key={s.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-900/40">
                         <td className="p-2">
                           <input
                             type="text"
@@ -1177,7 +1177,7 @@ export default function App() {
                               updateCurrentStockholder(s.id, { nameAndNationality: e.target.value })
                             }
                             placeholder="JUAN DELA CRUZ (Filipino)"
-                            className="w-full px-2 py-1 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-blue-500"
+                            className="w-full px-2 py-1 border border-slate-300 rounded text-xs focus:ring-1 focus:ring-emerald-600"
                           />
                         </td>
                         <td className="p-2 text-center">
@@ -1245,9 +1245,9 @@ export default function App() {
               </div>
 
               {/* Treasury Shares Option */}
-              <div className="mt-4 p-3.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="mt-4 p-3.5 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-800 rounded-xl grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                     Treasury Shares (No. of Shares, if any)
                   </label>
                   <input
@@ -1260,7 +1260,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                     Treasury Shares Subscribed (Php)
                   </label>
                   <input
@@ -1274,7 +1274,7 @@ export default function App() {
                   />
                 </div>
                 <div>
-                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                  <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                     Treasury Shares Paid-up (Php)
                   </label>
                   <input
@@ -1293,47 +1293,47 @@ export default function App() {
             {/* 4. Meetings & Statutory Compliance Checkboxes */}
             <section
               id="sec-4-meetings"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <Calendar className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-base mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
+                <Calendar className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
                 <span>4. Meetings &amp; Item 6 Statutory Compliance Boxes</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-5">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Stockholders&rsquo; Meeting Date
                   </label>
                   <input
                     type="date"
                     value={formData.shMeetingDate}
                     onChange={e => updateField('shMeetingDate', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Board of Directors Meeting Date
                   </label>
                   <input
                     type="date"
                     value={formData.bodMeetingDate}
                     onChange={e => updateField('bodMeetingDate', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Document Execution / Notarial Year
                   </label>
                   <select
                     aria-label="Document Execution Year"
                     value={formData.execYear || String(new Date().getFullYear())}
                     onChange={e => updateField('execYear', e.target.value)}
-                    className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm font-semibold border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   >
                     <option value="2025">2025</option>
                     <option value="2026">2026</option>
@@ -1346,13 +1346,13 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Meeting Format
                   </label>
                   <select
                     value={formData.meetingFormat}
                     onChange={e => updateField('meetingFormat', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   >
                     <option value="at the principal office">At the principal office</option>
                     <option value="through electronic means, in compliance with the rules set in SEC Memorandum Circular No. 6, s. 2020">
@@ -1362,61 +1362,61 @@ export default function App() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label className="block text-xs font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                     Amended Article Provision(s)
                   </label>
                   <input
                     type="text"
                     value={formData.amendedArticle}
                     onChange={e => updateField('amendedArticle', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
               </div>
 
               {/* Item 6 Statutory Compliance Checkboxes */}
-              <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+              <div className="p-4 bg-emerald-50/50 dark:bg-emerald-900/40 border border-emerald-200 dark:border-emerald-800 rounded-xl">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="font-semibold text-sm text-slate-800 dark:text-slate-100">
+                  <span className="font-semibold text-sm text-emerald-950 dark:text-emerald-50">
                     6. That the requirements of:
                   </span>
-                  <span className="text-[11px] text-slate-500 dark:text-slate-400">
+                  <span className="text-[11px] text-slate-500 dark:text-emerald-300">
                     (Click to mark/unmark boxes; marked boxes will display with &lsquo;✓&rsquo; in the stacked box table)
                   </span>
                 </div>
                 <div className="space-y-2 text-xs">
-                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg cursor-pointer hover:bg-emerald-50/60 dark:hover:bg-emerald-900 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec37}
                       onChange={e => updateField('chkSec37', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                      className="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-600 accent-emerald-700"
                     />
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                    <span className="font-medium text-slate-800 dark:text-emerald-100">
                       Section 37 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
 
-                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg cursor-pointer hover:bg-emerald-50/60 dark:hover:bg-emerald-900 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec38}
                       onChange={e => updateField('chkSec38', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                      className="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-600 accent-emerald-700"
                     />
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                    <span className="font-medium text-slate-800 dark:text-emerald-100">
                       Section 38 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
 
-                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-blue-50/50 dark:hover:bg-slate-800 transition-colors">
+                  <label className="flex items-center gap-3 p-2.5 bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg cursor-pointer hover:bg-emerald-50/60 dark:hover:bg-emerald-900 transition-colors">
                     <input
                       type="checkbox"
                       checked={formData.chkSec42}
                       onChange={e => updateField('chkSec42', e.target.checked)}
-                      className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+                      className="w-4 h-4 text-emerald-700 rounded border-slate-300 focus:ring-emerald-600 accent-emerald-700"
                     />
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                    <span className="font-medium text-slate-800 dark:text-emerald-100">
                       Section 42 of the Revised Corporation Code of the Philippines have been complied with;
                     </span>
                   </label>
@@ -1427,10 +1427,10 @@ export default function App() {
             {/* 5. Officers & Directors Card */}
             <section
               id="sec-5-officers"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-                <Users className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+              <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-sm sm:text-base mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
+                <Users className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                 <span>5. Officers, Meeting Chairs &amp; Board of Directors</span>
               </div>
 
@@ -1444,7 +1444,7 @@ export default function App() {
                     type="text"
                     value={formData.presName}
                     onChange={e => updateField('presName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1455,7 +1455,7 @@ export default function App() {
                     type="text"
                     value={formData.presTIN}
                     onChange={e => updateField('presTIN', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1466,7 +1466,7 @@ export default function App() {
                     type="text"
                     value={formData.treasName}
                     onChange={e => updateField('treasName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1477,7 +1477,7 @@ export default function App() {
                     type="text"
                     value={formData.treasTIN}
                     onChange={e => updateField('treasTIN', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1488,7 +1488,7 @@ export default function App() {
                     type="text"
                     value={formData.secName}
                     onChange={e => updateField('secName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1499,7 +1499,7 @@ export default function App() {
                     type="text"
                     value={formData.secTIN}
                     onChange={e => updateField('secTIN', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1510,7 +1510,7 @@ export default function App() {
                     type="text"
                     value={formData.chairName}
                     onChange={e => updateField('chairName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
                 <div>
@@ -1521,20 +1521,20 @@ export default function App() {
                     type="text"
                     value={formData.meetingSecName}
                     onChange={e => updateField('meetingSecName', e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 text-sm border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-600"
                   />
                 </div>
               </div>
 
               {/* Directors Header */}
               <div className="flex items-center justify-between mb-3">
-                <span className="font-semibold text-xs sm:text-sm text-slate-800 dark:text-slate-200">
+                <span className="font-semibold text-xs sm:text-sm text-emerald-950 dark:text-emerald-100">
                   Board of Directors (Signatories on Dedicated Following Page)
                 </span>
                 <button
                   type="button"
                   onClick={addDirector}
-                  className="hidden sm:flex items-center gap-1 text-xs text-blue-700 dark:text-blue-300 hover:text-blue-900 font-semibold px-2.5 py-1.5 bg-blue-50 dark:bg-blue-950/60 rounded-lg border border-blue-200 dark:border-blue-800"
+                  className="hidden sm:flex items-center gap-1 text-xs text-emerald-800 dark:text-emerald-300 hover:text-emerald-950 font-semibold px-2.5 py-1.5 bg-emerald-50 dark:bg-emerald-950/60 rounded-lg border border-emerald-200 dark:border-emerald-800"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Director
@@ -1546,10 +1546,10 @@ export default function App() {
                 {formData.directors.map((d, idx) => (
                   <div
                     key={d.id}
-                    className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 space-y-2.5"
+                    className="p-3.5 rounded-xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-900/40 space-y-2.5"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">
+                      <span className="text-xs font-bold text-emerald-900 dark:text-emerald-100 bg-white dark:bg-emerald-950 px-2.5 py-1 rounded-md border border-emerald-200 dark:border-emerald-700">
                         Director #{idx + 1}
                       </span>
                       <button
@@ -1563,7 +1563,7 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                         Director Full Name
                       </label>
                       <input
@@ -1577,7 +1577,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           TIN (Auto-fills Evidence of ID)
                         </label>
                         <input
@@ -1589,7 +1589,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Competent Evidence of Identity
                         </label>
                         <input
@@ -1607,7 +1607,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addDirector}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-50 dark:bg-blue-950/60 active:bg-blue-100 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-xl border border-blue-200 dark:border-blue-800 transition-colors"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-950/60 active:bg-emerald-100 text-emerald-800 dark:text-emerald-300 text-xs font-bold rounded-xl border border-emerald-200 dark:border-emerald-800 transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Director
@@ -1616,8 +1616,8 @@ export default function App() {
 
               {/* Desktop Table for Board of Directors (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
-                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
+                <table className="w-full text-left text-xs border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                  <thead className="bg-emerald-50/70 dark:bg-emerald-900/70 text-emerald-950 dark:text-emerald-100 font-semibold border-b border-emerald-200 dark:border-emerald-700">
                     <tr>
                       <th className="p-2.5">Director Name</th>
                       <th className="p-2.5 w-48">TIN</th>
@@ -1625,9 +1625,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tbody className="divide-y divide-emerald-100 dark:divide-emerald-800">
                     {formData.directors.map(d => (
-                      <tr key={d.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <tr key={d.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-900/40">
                         <td className="p-2">
                           <input
                             type="text"
@@ -1674,15 +1674,15 @@ export default function App() {
             {/* 6. Subscriptions to the Increase Card */}
             <section
               id="sec-6-subs"
-              className="scroll-mt-16 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs p-4 sm:p-5 md:p-6"
+              className="scroll-mt-16 bg-white dark:bg-emerald-900/40 rounded-2xl border border-emerald-200 dark:border-emerald-800 shadow-xs p-4 sm:p-5 md:p-6"
             >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 border-b border-emerald-100 dark:border-emerald-800 pb-3">
                 <div>
-                  <div className="flex items-center gap-2 text-blue-900 dark:text-blue-300 font-semibold text-sm sm:text-base">
-                    <FileText className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0" />
+                  <div className="flex items-center gap-2 text-emerald-900 dark:text-emerald-300 font-semibold text-sm sm:text-base">
+                    <FileText className="w-5 h-5 text-emerald-700 dark:text-emerald-400 shrink-0" />
                     <span>6. Subscriptions to the Increase &amp; Document Routing</span>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  <p className="text-xs text-slate-500 dark:text-emerald-300 mt-1">
                     Select payment mode: <b>Cash</b> generates a Subscription Contract. <b>Conversion</b> generates a Deed of Assignment.
                     {allCash && (
                       <span className="block text-emerald-700 dark:text-emerald-400 font-medium mt-0.5">
@@ -1694,7 +1694,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addSubscriber}
-                  className="hidden sm:flex items-center gap-1 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors shrink-0"
+                  className="hidden sm:flex items-center gap-1 px-3.5 py-2 bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   Add Subscriber
@@ -1706,20 +1706,20 @@ export default function App() {
                 {formData.subscribers.map((s, idx) => (
                   <div
                     key={s.id}
-                    className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 space-y-3.5 shadow-2xs"
+                    className="p-4 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50/40 dark:bg-emerald-900/40 space-y-3.5 shadow-2xs"
                   >
-                    <div className="flex items-center justify-between gap-2 border-b border-slate-200/80 dark:border-slate-700 pb-2.5">
+                    <div className="flex items-center justify-between gap-2 border-b border-emerald-200/80 dark:border-emerald-800 pb-2.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200 bg-white dark:bg-slate-900 px-2.5 py-1 rounded-lg border border-slate-200 dark:border-slate-700">
+                        <span className="text-xs font-bold text-emerald-900 dark:text-emerald-100 bg-white dark:bg-emerald-950 px-2.5 py-1 rounded-lg border border-emerald-200 dark:border-emerald-700">
                           Subscriber #{idx + 1}
                         </span>
                         <span
                           className={`text-[11px] font-semibold px-2 py-0.5 rounded-md border ${
                             s.modeOfPayment === 'Cash'
-                              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-800'
+                              ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800'
                               : s.modeOfPayment === 'Conversion'
-                                ? 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800'
-                                : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-800 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800'
+                                ? 'bg-teal-50 dark:bg-teal-950/60 text-teal-800 dark:text-teal-300 border-teal-200 dark:border-teal-800'
+                                : 'bg-green-50 dark:bg-green-950/60 text-green-800 dark:text-green-300 border-green-200 dark:border-green-800'
                           }`}
                         >
                           {s.modeOfPayment === 'Both' ? 'Cash + Conversion' : s.modeOfPayment}
@@ -1737,7 +1737,7 @@ export default function App() {
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div className="sm:col-span-2">
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Subscriber Full Name
                         </label>
                         <input
@@ -1749,7 +1749,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Nationality
                         </label>
                         <input
@@ -1762,7 +1762,7 @@ export default function App() {
                     </div>
 
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                         Residential Address
                       </label>
                       <input
@@ -1778,7 +1778,7 @@ export default function App() {
 
                     {/* Payment Mode Selector */}
                     <div>
-                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      <label className="block text-[11px] font-semibold text-slate-700 dark:text-emerald-200 mb-1">
                         Mode of Payment &amp; Document Routing
                       </label>
                       <select
@@ -1790,10 +1790,10 @@ export default function App() {
                         }
                         className={`w-full min-h-[44px] text-sm font-semibold px-3 py-2 border rounded-xl ${
                           s.modeOfPayment === 'Cash'
-                            ? 'bg-blue-50 text-blue-800 border-blue-200'
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                             : s.modeOfPayment === 'Conversion'
-                              ? 'bg-purple-50 text-purple-800 border-purple-200'
-                              : 'bg-indigo-50 text-indigo-900 border-indigo-300'
+                              ? 'bg-teal-50 text-teal-800 border-teal-200'
+                              : 'bg-green-50 text-green-900 border-green-300'
                         }`}
                       >
                         <option value="Cash">Cash (Subscription Contract)</option>
@@ -1805,7 +1805,7 @@ export default function App() {
                     {/* Shares, Price & Paid Grid */}
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Total Shares
                         </label>
                         <input
@@ -1825,7 +1825,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Price / Share
                         </label>
                         <input
@@ -1841,7 +1841,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                           Total Paid
                         </label>
                         <input
@@ -1865,8 +1865,8 @@ export default function App() {
 
                     {/* Conversion Description on Mobile */}
                     {s.modeOfPayment === 'Conversion' && (
-                      <div className="p-3 bg-purple-50/90 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-xl">
-                        <label className="block text-xs font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                      <div className="p-3 bg-teal-50/90 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 rounded-xl">
+                        <label className="block text-xs font-semibold text-teal-900 dark:text-teal-200 mb-1">
                           In the form of (Deed of Assignment):
                         </label>
                         <input
@@ -1878,21 +1878,21 @@ export default function App() {
                             })
                           }
                           placeholder="e.g. Advances from Stockholders / Loans Payable"
-                          className="w-full px-3 py-2 bg-white border border-purple-300 rounded-lg text-sm text-slate-900 font-medium"
+                          className="w-full px-3 py-2 bg-white border border-teal-300 rounded-lg text-sm text-slate-900 font-medium"
                         />
                       </div>
                     )}
 
                     {/* Both Cash & Conversion Breakdown on Mobile */}
                     {s.modeOfPayment === 'Both' && (
-                      <div className="p-3 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-xl space-y-3">
-                        <div className="p-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-lg">
-                          <div className="text-xs font-bold text-blue-800 dark:text-blue-300 mb-2">
+                      <div className="p-3 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-xl space-y-3">
+                        <div className="p-2.5 bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                          <div className="text-xs font-bold text-emerald-800 dark:text-emerald-300 mb-2">
                             1. Cash Portion (Subscription Contract)
                           </div>
                           <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                                 Cash Shares
                               </label>
                               <input
@@ -1907,7 +1907,7 @@ export default function App() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                                 Cash Paid (Php)
                               </label>
                               <input
@@ -1925,13 +1925,13 @@ export default function App() {
                           </div>
                         </div>
 
-                        <div className="p-2.5 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 rounded-lg">
-                          <div className="text-xs font-bold text-purple-800 dark:text-purple-300 mb-2">
+                        <div className="p-2.5 bg-white dark:bg-emerald-950 border border-teal-200 dark:border-teal-800 rounded-lg">
+                          <div className="text-xs font-bold text-teal-800 dark:text-teal-300 mb-2">
                             2. Conversion Portion (Deed of Assignment)
                           </div>
                           <div className="grid grid-cols-2 gap-2 mb-2.5">
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                                 Conv. Shares
                               </label>
                               <input
@@ -1946,7 +1946,7 @@ export default function App() {
                               />
                             </div>
                             <div>
-                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                              <label className="block text-[11px] font-semibold text-slate-600 dark:text-emerald-200 mb-1">
                                 Conv. Paid (Php)
                               </label>
                               <input
@@ -1962,7 +1962,7 @@ export default function App() {
                               />
                             </div>
                           </div>
-                          <label className="block text-[11px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                          <label className="block text-[11px] font-semibold text-teal-900 dark:text-teal-200 mb-1">
                             In the form of (Deed of Assignment):
                           </label>
                           <input
@@ -1974,7 +1974,7 @@ export default function App() {
                               })
                             }
                             placeholder="e.g. Advances from Stockholders / Loans Payable"
-                            className="w-full px-3 py-1.5 bg-white border border-purple-300 rounded-lg text-sm text-slate-900 font-medium"
+                            className="w-full px-3 py-1.5 bg-white border border-teal-300 rounded-lg text-sm text-slate-900 font-medium"
                           />
                         </div>
                       </div>
@@ -2013,7 +2013,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={addSubscriber}
-                  className="w-full min-h-[46px] flex items-center justify-center gap-1.5 px-4 py-3 bg-blue-600 active:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+                  className="w-full min-h-[46px] flex items-center justify-center gap-1.5 px-4 py-3 bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Add Subscriber
@@ -2022,8 +2022,8 @@ export default function App() {
 
               {/* Desktop Table for Subscribers (>= 768px) */}
               <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-left text-xs border border-slate-200 dark:border-slate-800 rounded-lg">
-                  <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-700 dark:text-slate-200 font-semibold border-b border-slate-200 dark:border-slate-700">
+                <table className="w-full text-left text-xs border border-emerald-200 dark:border-emerald-800 rounded-lg">
+                  <thead className="bg-emerald-50/70 dark:bg-emerald-900/70 text-emerald-950 dark:text-emerald-100 font-semibold border-b border-emerald-200 dark:border-emerald-700">
                     <tr>
                       <th className="p-2.5">Subscriber Name</th>
                       <th className="p-2.5 w-24">Nationality</th>
@@ -2036,9 +2036,9 @@ export default function App() {
                       <th className="p-2.5 w-12 text-center">Action</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                  <tbody className="divide-y divide-emerald-100 dark:divide-emerald-800">
                     {formData.subscribers.map(s => (
-                      <tr key={s.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                      <tr key={s.id} className="hover:bg-emerald-50/40 dark:hover:bg-emerald-900/40">
                         <td className="p-2 align-top">
                           <input
                             type="text"
@@ -2131,10 +2131,10 @@ export default function App() {
                             }
                             className={`w-full text-xs font-medium px-2 py-1 border rounded ${
                               s.modeOfPayment === 'Cash'
-                                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                                ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
                                 : s.modeOfPayment === 'Conversion'
-                                  ? 'bg-purple-50 text-purple-700 border-purple-200'
-                                  : 'bg-indigo-50 text-indigo-800 border-indigo-300'
+                                  ? 'bg-teal-50 text-teal-800 border-teal-200'
+                                  : 'bg-green-50 text-green-900 border-green-300'
                             }`}
                           >
                             <option value="Cash">Cash (Subscription Contract)</option>
@@ -2143,8 +2143,8 @@ export default function App() {
                           </select>
 
                           {s.modeOfPayment === 'Conversion' && (
-                            <div className="mt-2 p-2 bg-purple-50/80 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800 rounded-md text-left">
-                              <label className="block text-[11px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                            <div className="mt-2 p-2 bg-teal-50/80 dark:bg-teal-950/40 border border-teal-200 dark:border-teal-800 rounded-md text-left">
+                              <label className="block text-[11px] font-semibold text-teal-900 dark:text-teal-200 mb-1">
                                 In the form of (Deed of Assignment):
                               </label>
                               <input
@@ -2156,21 +2156,21 @@ export default function App() {
                                   })
                                 }
                                 placeholder="e.g. Advances from Stockholders / Loans Payable"
-                                className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                className="w-full px-2 py-1 bg-white border border-teal-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
                               />
                             </div>
                           )}
 
                           {s.modeOfPayment === 'Both' && (
-                            <div className="mt-2 p-2.5 bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 rounded-md text-left space-y-2.5">
+                            <div className="mt-2 p-2.5 bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-md text-left space-y-2.5">
                               {/* Cash Portion */}
-                              <div className="p-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded">
-                                <div className="text-[11px] font-bold text-blue-800 dark:text-blue-300 mb-1.5">
+                              <div className="p-2 bg-white dark:bg-emerald-950 border border-emerald-200 dark:border-emerald-800 rounded">
+                                <div className="text-[11px] font-bold text-emerald-800 dark:text-emerald-300 mb-1.5">
                                   1. Cash Portion (Subscription Contract)
                                 </div>
                                 <div className="grid grid-cols-2 gap-1.5">
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-emerald-200">
                                       Cash Shares
                                     </label>
                                     <input
@@ -2185,7 +2185,7 @@ export default function App() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-emerald-200">
                                       Cash Paid (Php)
                                     </label>
                                     <input
@@ -2204,13 +2204,13 @@ export default function App() {
                               </div>
 
                               {/* Conversion Portion */}
-                              <div className="p-2 bg-white dark:bg-slate-900 border border-purple-200 dark:border-purple-800 rounded">
-                                <div className="text-[11px] font-bold text-purple-800 dark:text-purple-300 mb-1.5">
+                              <div className="p-2 bg-white dark:bg-emerald-950 border border-teal-200 dark:border-teal-800 rounded">
+                                <div className="text-[11px] font-bold text-teal-800 dark:text-teal-300 mb-1.5">
                                   2. Conversion Portion (Deed of Assignment)
                                 </div>
                                 <div className="grid grid-cols-2 gap-1.5 mb-2">
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-emerald-200">
                                       Conv. Shares
                                     </label>
                                     <input
@@ -2225,7 +2225,7 @@ export default function App() {
                                     />
                                   </div>
                                   <div>
-                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-300">
+                                    <label className="block text-[10px] font-semibold text-slate-600 dark:text-emerald-200">
                                       Conv. Paid (Php)
                                     </label>
                                     <input
@@ -2241,7 +2241,7 @@ export default function App() {
                                     />
                                   </div>
                                 </div>
-                                <label className="block text-[10px] font-semibold text-purple-900 dark:text-purple-200 mb-1">
+                                <label className="block text-[10px] font-semibold text-teal-900 dark:text-teal-200 mb-1">
                                   In the form of (Deed of Assignment):
                                 </label>
                                 <input
@@ -2253,7 +2253,7 @@ export default function App() {
                                     })
                                   }
                                   placeholder="e.g. Advances from Stockholders / Loans Payable"
-                                  className="w-full px-2 py-1 bg-white border border-purple-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-purple-500"
+                                  className="w-full px-2 py-1 bg-white border border-teal-300 rounded text-xs text-slate-900 font-medium focus:outline-none focus:ring-2 focus:ring-teal-500"
                                 />
                               </div>
                             </div>
@@ -2309,7 +2309,7 @@ export default function App() {
                   setViewMode('preview');
                   scrollToTop();
                 }}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-6 py-3 bg-emerald-800 hover:bg-emerald-900 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
               >
                 <Eye className="w-4 h-4" />
                 Generate &amp; Preview All Documents
@@ -2329,9 +2329,9 @@ export default function App() {
                 type="button"
                 disabled={isGeneratingZip}
                 onClick={() => handleDownloadZip('pdf')}
-                className="px-5 py-3 bg-slate-800 hover:bg-slate-900 disabled:opacity-60 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-5 py-3 bg-white hover:bg-emerald-50 disabled:opacity-60 text-emerald-900 border border-emerald-300 font-semibold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-4 h-4 text-emerald-700" />
                 PDFs Only (.zip)
               </button>
 
@@ -2339,9 +2339,9 @@ export default function App() {
                 type="button"
                 disabled={isGeneratingZip}
                 onClick={() => handleDownloadZip('word')}
-                className="px-5 py-3 bg-slate-700 hover:bg-slate-800 disabled:opacity-60 text-white font-semibold text-sm rounded-xl shadow-md transition-all flex items-center justify-center gap-2"
+                className="px-5 py-3 bg-white hover:bg-emerald-50 disabled:opacity-60 text-emerald-900 border border-emerald-300 font-semibold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-4 h-4 text-emerald-700" />
                 Word Only (.zip)
               </button>
             </div>
@@ -2359,18 +2359,18 @@ export default function App() {
           }
         >
           {/* Top Control Bar for Preview */}
-          <div className="bg-slate-800 text-white p-3 rounded-2xl mb-4 sm:mb-6 space-y-2.5 text-xs print:hidden no-print">
+          <div className="bg-emerald-800 dark:bg-emerald-900 text-white p-3 rounded-2xl mb-4 sm:mb-6 space-y-2.5 text-xs print:hidden no-print shadow-sm">
             <div className="flex flex-wrap items-center justify-between gap-2.5">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className="font-semibold text-slate-100">A4 Document Preview</span>
-                <div className="flex items-center gap-1.5 bg-slate-900/80 border border-slate-700 px-2.5 py-1 rounded-xl">
-                  <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                  <span className="text-slate-300 font-medium">Document Year:</span>
+                <span className="font-semibold text-white">A4 Document Preview</span>
+                <div className="flex items-center gap-1.5 bg-emerald-950/70 border border-emerald-700 px-2.5 py-1 rounded-xl">
+                  <Calendar className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
+                  <span className="text-emerald-100 font-medium">Document Year:</span>
                   <select
                     aria-label="Document Year in Preview"
                     value={formData.execYear || String(new Date().getFullYear())}
                     onChange={e => updateField('execYear', e.target.value)}
-                    className="bg-slate-800 text-white font-bold px-2 py-0.5 rounded border border-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-400 text-xs"
+                    className="bg-emerald-900 text-white font-bold px-2 py-0.5 rounded border border-emerald-600 focus:outline-none focus:ring-1 focus:ring-yellow-400 text-xs"
                   >
                     <option value="2025">2025</option>
                     <option value="2026">2026</option>
@@ -2389,7 +2389,7 @@ export default function App() {
                     setViewMode('form');
                     scrollToTop();
                   }}
-                  className="min-h-[38px] px-3.5 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-slate-200 font-medium transition-colors"
+                  className="min-h-[38px] px-3.5 py-1.5 bg-emerald-900/80 hover:bg-emerald-700 border border-emerald-700 rounded-xl text-white font-medium transition-colors"
                 >
                   &larr; Edit Form
                 </button>
@@ -2398,7 +2398,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setFitMobileScreen(prev => !prev)}
-                  className="md:hidden min-h-[38px] px-3 py-1.5 bg-slate-700 active:bg-slate-600 rounded-xl text-slate-200 font-medium flex items-center gap-1.5"
+                  className="md:hidden min-h-[38px] px-3 py-1.5 bg-emerald-900/80 active:bg-emerald-700 border border-emerald-700 rounded-xl text-white font-medium flex items-center gap-1.5"
                 >
                   {fitMobileScreen ? (
                     <>
@@ -2417,16 +2417,16 @@ export default function App() {
                   type="button"
                   disabled={isGeneratingZip}
                   onClick={() => handleDownloadZip('both')}
-                  className="hidden sm:flex min-h-[38px] px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                  className="hidden sm:flex min-h-[38px] px-3.5 py-1.5 bg-white hover:bg-emerald-50 disabled:opacity-60 rounded-xl text-emerald-900 font-bold items-center gap-1.5 transition-colors"
                 >
-                  <Download className="w-3.5 h-3.5" />
+                  <Download className="w-3.5 h-3.5 text-emerald-700" />
                   <span>{isGeneratingZip ? 'Generating...' : 'Download ZIP (PDF & Word)'}</span>
                 </button>
                 <button
                   type="button"
                   disabled={isGeneratingZip}
                   onClick={() => handleDownloadZip('pdf')}
-                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-blue-600 hover:bg-blue-500 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>PDFs (.zip)</span>
@@ -2435,7 +2435,7 @@ export default function App() {
                   type="button"
                   disabled={isGeneratingZip}
                   onClick={() => handleDownloadZip('word')}
-                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-slate-700 hover:bg-slate-600 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
+                  className="hidden sm:flex min-h-[38px] px-3 py-1.5 bg-emerald-900/80 hover:bg-emerald-700 border border-emerald-700 disabled:opacity-60 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
                 >
                   <FileText className="w-3.5 h-3.5" />
                   <span>Word (.zip)</span>
@@ -2443,7 +2443,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="hidden lg:flex min-h-[38px] px-3 py-1.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-slate-200 font-semibold items-center gap-1.5 transition-colors"
+                  className="hidden lg:flex min-h-[38px] px-3 py-1.5 bg-emerald-900/80 hover:bg-emerald-700 border border-emerald-700 rounded-xl text-white font-semibold items-center gap-1.5 transition-colors"
                 >
                   <Printer className="w-3.5 h-3.5" />
                   <span>Print</span>
@@ -2452,14 +2452,14 @@ export default function App() {
             </div>
 
             {/* Mobile Dedicated Touch-Friendly ZIP Export Toolbar (< 768px) */}
-            <div className="md:hidden pt-2 border-t border-slate-700 space-y-2">
+            <div className="md:hidden pt-2 border-t border-emerald-700 space-y-2">
               <button
                 type="button"
                 disabled={isGeneratingZip}
                 onClick={() => handleDownloadZip('both')}
-                className="w-full min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 disabled:opacity-60 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
+                className="w-full min-h-[44px] px-3 py-2 bg-white active:bg-emerald-50 disabled:opacity-60 text-emerald-900 font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shadow-sm"
               >
-                <Download className="w-4 h-4 shrink-0" />
+                <Download className="w-4 h-4 text-emerald-700 shrink-0" />
                 <span>
                   {isGeneratingZip
                     ? 'Generating ZIP Package...'
@@ -2471,7 +2471,7 @@ export default function App() {
                   type="button"
                   disabled={isGeneratingZip}
                   onClick={() => handleDownloadZip('pdf')}
-                  className="min-h-[40px] px-2.5 py-1.5 bg-blue-600 active:bg-blue-700 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
+                  className="min-h-[40px] px-2.5 py-1.5 bg-emerald-600 active:bg-emerald-500 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
                 >
                   <FileText className="w-3.5 h-3.5 shrink-0" />
                   <span>PDFs (.zip)</span>
@@ -2480,7 +2480,7 @@ export default function App() {
                   type="button"
                   disabled={isGeneratingZip}
                   onClick={() => handleDownloadZip('word')}
-                  className="min-h-[40px] px-2.5 py-1.5 bg-slate-700 active:bg-slate-600 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
+                  className="min-h-[40px] px-2.5 py-1.5 bg-emerald-900/80 active:bg-emerald-700 border border-emerald-700 disabled:opacity-60 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
                 >
                   <FileText className="w-3.5 h-3.5 shrink-0" />
                   <span>Word (.zip)</span>
@@ -2488,7 +2488,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="min-h-[40px] px-2.5 py-1.5 bg-slate-700 active:bg-slate-600 text-slate-200 font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
+                  className="min-h-[40px] px-2.5 py-1.5 bg-emerald-900/80 active:bg-emerald-700 border border-emerald-700 text-white font-semibold text-xs rounded-xl flex items-center justify-center gap-1 shadow-sm"
                 >
                   <Printer className="w-3.5 h-3.5 shrink-0" />
                   <span>Print</span>
@@ -2507,7 +2507,7 @@ export default function App() {
       </main>
 
       {/* Mobile Solid Thumb-Zone Bottom Action Bar (< 768px) */}
-      <div className="md:hidden shrink-0 z-50 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(15,23,42,0.08)] print:hidden no-print">
+      <div className="md:hidden shrink-0 z-50 bg-white dark:bg-emerald-950 border-t border-emerald-200 dark:border-emerald-800 px-3 pt-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] shadow-[0_-4px_16px_rgba(6,78,59,0.08)] print:hidden no-print">
         {viewMode === 'form' ? (
           <div className="grid grid-cols-2 gap-2 max-w-lg mx-auto">
             <button
@@ -2516,7 +2516,7 @@ export default function App() {
                 setViewMode('preview');
                 scrollToTop();
               }}
-              className="min-h-[44px] px-3 py-2 bg-blue-600 active:bg-blue-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              className="min-h-[44px] px-3 py-2 bg-emerald-800 active:bg-emerald-900 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Eye className="w-4 h-4 shrink-0" />
               <span>Preview Documents</span>
@@ -2540,7 +2540,7 @@ export default function App() {
                 setViewMode('form');
                 scrollToTop();
               }}
-              className="min-h-[44px] px-2.5 py-2 bg-slate-700 active:bg-slate-800 text-white rounded-xl font-semibold text-xs flex items-center justify-center gap-1 shadow-xs"
+              className="min-h-[44px] px-2.5 py-2 bg-emerald-50 dark:bg-emerald-900 active:bg-emerald-100 text-emerald-900 dark:text-emerald-100 border border-emerald-300 dark:border-emerald-700 rounded-xl font-semibold text-xs flex items-center justify-center gap-1 shadow-xs"
             >
               <Edit3 className="w-4 h-4 shrink-0" />
               <span>&larr; Form</span>
@@ -2550,7 +2550,7 @@ export default function App() {
               type="button"
               disabled={isGeneratingZip}
               onClick={() => handleDownloadZip('both')}
-              className="col-span-2 min-h-[44px] px-3 py-2 bg-emerald-600 active:bg-emerald-700 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
+              className="col-span-2 min-h-[44px] px-3 py-2 bg-emerald-700 active:bg-emerald-800 disabled:opacity-60 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 shadow-xs"
             >
               <Download className="w-4 h-4 shrink-0" />
               <span>{isGeneratingZip ? 'Generating ZIP...' : 'Download ZIP (PDF & Word)'}</span>
