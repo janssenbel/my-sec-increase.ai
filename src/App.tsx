@@ -98,10 +98,19 @@ export default function App() {
 
   useEffect(() => {
     const root = document.documentElement;
+    const themeHex = darkMode ? '#022c22' : '#15803d';
     if (darkMode) {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
+    }
+    root.style.backgroundColor = themeHex;
+    if (document.body) {
+      document.body.style.backgroundColor = themeHex;
+    }
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', themeHex);
     }
     try {
       window.localStorage.setItem('sec-theme', darkMode ? 'dark' : 'light');
@@ -512,9 +521,12 @@ export default function App() {
 
   return (
     <div className="h-dvh overflow-hidden bg-emerald-50/40 dark:bg-emerald-950 text-slate-900 dark:text-emerald-50 flex flex-col font-sans transition-colors print:bg-white print:text-black print:block print:h-auto print:min-h-0 print:overflow-visible">
-      {/* Top Application Header (Fixed flex-child above inner scroll container so iOS standalone status bar blur never activates) */}
-      <header className="shrink-0 bg-emerald-800 dark:bg-emerald-950 text-white border-b border-emerald-700 dark:border-emerald-900 pt-[env(safe-area-inset-top)] relative z-40 shadow-md print:hidden no-print">
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between gap-2 sm:gap-4">
+      {/* Top Application Header (Non-header div with solid top safe-area cushion so iOS 26 status bar blur pocket never overlaps header content) */}
+      <div
+        role="banner"
+        className="shrink-0 bg-[#15803d] dark:bg-[#022c22] text-white border-b border-emerald-600/60 dark:border-emerald-900 pt-[calc(env(safe-area-inset-top,0px)+28px)] sm:pt-3 pb-2.5 sm:pb-3 relative z-40 shadow-md print:hidden no-print"
+      >
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-2.5 min-w-0">
             <img
               src={appIconUrl}
@@ -536,7 +548,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setIsProfileModalOpen(true)}
-              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-900/70 hover:bg-emerald-700 active:bg-emerald-600 text-white border border-emerald-700 flex items-center gap-1.5 text-xs font-semibold transition-colors"
+              className="min-h-[38px] px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-900/70 hover:bg-emerald-800 active:bg-emerald-950 text-white border border-emerald-600/60 dark:border-emerald-800 flex items-center gap-1.5 text-xs font-semibold transition-colors"
               title="Open Saved Company Profiles"
             >
               <FolderOpen className="w-3.5 h-3.5 text-yellow-300 shrink-0" />
@@ -554,7 +566,7 @@ export default function App() {
               onClick={() => setDarkMode(prev => !prev)}
               aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
               title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-              className="min-h-[38px] min-w-[38px] p-2 rounded-xl bg-emerald-900/70 hover:bg-emerald-700 active:bg-emerald-600 text-white border border-emerald-700 flex items-center justify-center transition-colors"
+              className="min-h-[38px] min-w-[38px] p-2 rounded-xl bg-emerald-900/70 hover:bg-emerald-800 active:bg-emerald-950 text-white border border-emerald-600/60 dark:border-emerald-800 flex items-center justify-center transition-colors"
             >
               {darkMode ? (
                 <Sun className="w-4 h-4 text-yellow-300" />
@@ -564,7 +576,7 @@ export default function App() {
             </button>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center bg-emerald-900/80 p-1 rounded-xl border border-emerald-700">
+            <div className="flex items-center bg-emerald-900/80 p-1 rounded-xl border border-emerald-600/60 dark:border-emerald-800">
               <button
                 type="button"
                 onClick={() => setViewMode('form')}
@@ -616,7 +628,7 @@ export default function App() {
                 }
                 window.print();
               }}
-              className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-emerald-700 hover:bg-emerald-600 text-white text-xs font-semibold rounded-lg border border-emerald-600 shadow-sm transition-colors"
+              className="hidden lg:flex items-center gap-1.5 px-3 py-2 bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-semibold rounded-lg border border-emerald-600 shadow-sm transition-colors"
               title="Print all documents"
             >
               <Printer className="w-3.5 h-3.5" />
@@ -625,7 +637,7 @@ export default function App() {
 
             </div>
         </div>
-      </header>
+      </div>
 
       {/* Main Content Area (Dedicated inner scroll container so root window never scrolls on iOS) */}
       <main

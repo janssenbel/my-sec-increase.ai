@@ -35,13 +35,19 @@
     background-color: #15803d;
   }
 
+  html.dark,
+  html.dark body {
+    background-color: #022c22;
+  }
+
   #root {
     height: 100dvh;
     width: 100%;
     overflow: hidden;
   }
 
-  header {
+  header,
+  [role="banner"] {
     -webkit-backdrop-filter: none !important;
     backdrop-filter: none !important;
   }
